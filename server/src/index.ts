@@ -144,7 +144,7 @@ async function handle(req: Request, env: Env, ctx: ExecutionContext): Promise<Re
   }
 
   // スタイルの見本画像（R2 の samples/<id>.jpg。誰でも見られる）
-  const sample = /^\/v1\/samples\/([a-z_]+)$/.exec(p);
+  const sample = /^\/v1\/samples\/([a-z0-9_]+)$/.exec(p);
   if (req.method === "GET" && sample) {
     const obj = await env.RESULTS.get(`samples/${sample[1]}.jpg`);
     if (!obj) throw new HttpError(404, "not_found");

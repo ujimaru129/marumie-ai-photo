@@ -136,7 +136,7 @@ export const depth = StyleSheet.create({
 });
 
 const s = StyleSheet.create({
-  title: { fontSize: 32, lineHeight: 38, letterSpacing: -0.6, color: C.ink },
+  title: { fontSize: 32, lineHeight: 46, letterSpacing: -0.6, color: C.ink },
   btn: { minHeight: 58, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 8 },
   pill: { paddingHorizontal: 18, height: 38, alignItems: 'center', justifyContent: 'center' },
   check: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 },
