@@ -1,0 +1,22 @@
+{
+  "_説明": "アプリに並べるスタイルの一覧（2026-11-17 時点の案）。prompt は styles/<名前>.txt、仕上げは signature.json。options があるスタイルは、利用者が選べる（選んだ値で使う指示文が変わる）。post は端末で後から重ねる処理（cover = 雑誌の題字、booth = MARUMIE PHOTO のロゴ）",
+  "styles": [
+    {"id": "digicam_flash", "kind": "effect", "name": {"ja": "デジカメフラッシュ", "en": "Digicam Flash"}, "prompt": "digicam_flash"},
+    {"id": "golden_hour", "kind": "effect", "name": {"ja": "夕焼けの逆光", "en": "Golden Hour"}, "prompt": "golden_hour"},
+    {"id": "day_flash", "kind": "effect", "name": {"ja": "昼のフラッシュ", "en": "Day Flash"}, "prompt": "day_flash"},
+    {"id": "neon_night", "kind": "effect", "name": {"ja": "ネオン", "en": "Neon Night"}, "prompt": "neon_night"},
+    {"id": "korean_studio", "kind": "template", "name": {"ja": "韓国スタジオ", "en": "Korean Studio"}, "prompt": "korean_studio"},
+    {"id": "cafe_window", "kind": "template", "name": {"ja": "カフェ", "en": "Cafe Window"}, "prompt": "cafe_window"},
+    {"id": "photobooth", "kind": "template", "name": {"ja": "フォトブース", "en": "Photo Booth"}, "prompt": "photobooth"},
+    {"id": "magazine_cover", "kind": "template", "name": {"ja": "雑誌の表紙", "en": "Magazine Cover"}, "prompt": "magazine_cover", "post": "cover"},
+    {"id": "tokyo_crossing", "kind": "template", "name": {"ja": "東京", "en": "Tokyo"}, "prompt": "tokyo_crossing"},
+    {"id": "strobe_black", "kind": "template", "name": {"ja": "スタジオストロボ", "en": "Studio Strobe"}, "prompt": "strobe_black"},
+    {"id": "rooftop_night", "kind": "template", "name": {"ja": "夜の屋上", "en": "Rooftop Night"}, "prompt": "rooftop_night"},
+    {"id": "beach_day", "kind": "template", "name": {"ja": "海辺", "en": "Beach"}, "prompt": "beach_day"},
+    {"id": "sakura", "kind": "template", "name": {"ja": "桜", "en": "Sakura"}, "prompt": "sakura", "season": "spring"},
+    {"id": "korean_booth", "kind": "template", "name": {"ja": "セルフ写真館", "en": "Seoul Photo Booth"}, "post": "booth",
+     "options": {"frame": {"label": {"ja": "枠の色", "en": "Frame"}, "default": "red",
+       "choices": {"red": {"label": {"ja": "赤", "en": "Red"}, "prompt": "korean_booth"},
+                   "black": {"label": {"ja": "黒", "en": "Black"}, "prompt": "korean_booth_black"}}}}}
+  ]
+}

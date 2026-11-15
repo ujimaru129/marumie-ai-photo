@@ -34,7 +34,6 @@
       "lut": "day",
       "grain": 0.2
     },
-    "vending_night": "night",
     "korean_booth": null,
     "korean_booth_black": null
   }

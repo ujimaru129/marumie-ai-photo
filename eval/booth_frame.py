@@ -43,8 +43,8 @@ def main():
     lum = float(frame @ [0.299, 0.587, 0.114])
     variant = "paper" if lum < 140 else "ink"
     tone = (248, 246, 239) if variant == "paper" else (26, 26, 26)
-    # ワードマークの幅は横幅の 42%（余白が狭いときは余白の高さに合わせて小さくする）
-    wm_w = int(W * 0.42)
+    # ワードマークの幅は横幅の 28%（余白が狭いときは余白の高さに合わせて小さくする）
+    wm_w = int(W * 0.28)
     wm_h = wm_w * 1667.4 / 9534.6
     if wm_h > margin * 0.45:
         wm_w = int(margin * 0.45 * 9534.6 / 1667.4)
