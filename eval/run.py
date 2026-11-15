@@ -36,6 +36,19 @@ def load_styles(names):
     return styles
 
 
+def mirror_styles():
+    """catalog.json で "mirror": true のスタイル（指示文の名前）。入力を左右反転して生成し、結果をもう一度反転して戻す。
+    モデルが「手は画面の左」に寄りがちなポーズを、逆向き（手が右・目線が左）で安定して出すため。顔は2回反転するので元のまま。"""
+    cat = json.load(open(os.path.join(HERE, "catalog.json"), encoding="utf-8"))
+    names = set()
+    for s in cat["styles"]:
+        if s.get("mirror"):
+            names.add(s.get("prompt", s["id"]))
+            for c in s.get("options", {}).get("frame", {}).get("choices", {}).values():
+                names.add(c["prompt"])
+    return names
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--inputs", default=os.path.join(HERE, "inputs"))
@@ -53,6 +66,7 @@ def main():
         photos = [p for p in photos if os.path.splitext(os.path.basename(p))[0] in a.photos.split(",")]
     styles = load_styles(a.styles)
     models = a.models.split(",")
+    mirrored = mirror_styles()
     os.makedirs(a.out, exist_ok=True)
     csv_path = os.path.join(a.out, "results.csv")
     new = not os.path.exists(csv_path)
@@ -79,10 +93,18 @@ def main():
         size = next((t.split("=", 1)[1] for t in tag.strip("[").split() if t.startswith("size=")), None)
         if size and m == "meta":
             kw["size"] = size
-        img, info = MODELS[m](open(p, "rb").read(), styles[s], **kw)
+        src = open(p, "rb").read()
+        if s in mirrored:
+            b = io.BytesIO()
+            Image.open(io.BytesIO(src)).transpose(Image.FLIP_LEFT_RIGHT).save(b, "JPEG", quality=95)
+            src = b.getvalue()
+        img, info = MODELS[m](src, styles[s], **kw)
         if img:
             # モデルによって形式が違う（Gemini は PNG、Muse Image は WebP）ので PNG にそろえる
-            Image.open(io.BytesIO(img)).save(dst, "PNG")
+            out = Image.open(io.BytesIO(img))
+            if s in mirrored:
+                out = out.transpose(Image.FLIP_LEFT_RIGHT)
+            out.save(dst, "PNG")
         row = {"time": datetime.datetime.now().isoformat(timespec="seconds"), "model": m, "style": s, "photo": name,
                "status": info["status"], "sec": info["sec"], "usd": PRICE_USD[m] if info["status"] == "ok" else 0,
                "usage": json.dumps(info.get("usage"), ensure_ascii=False) if info.get("usage") else "",

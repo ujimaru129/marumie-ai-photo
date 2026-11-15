@@ -14,7 +14,7 @@
     {"id": "rooftop_night", "kind": "template", "name": {"ja": "夜の屋上", "en": "Rooftop Night"}, "prompt": "rooftop_night"},
     {"id": "beach_day", "kind": "template", "name": {"ja": "海辺", "en": "Beach"}, "prompt": "beach_day"},
     {"id": "sakura", "kind": "template", "name": {"ja": "桜", "en": "Sakura"}, "prompt": "sakura", "season": "spring"},
-    {"id": "korean_booth", "kind": "template", "name": {"ja": "セルフ写真館", "en": "Seoul Photo Booth"}, "post": "booth",
+    {"id": "korean_booth", "kind": "template", "name": {"ja": "セルフ写真館", "en": "Seoul Photo Booth"}, "post": "booth", "mirror": true,
      "options": {"frame": {"label": {"ja": "枠の色", "en": "Frame"}, "default": "red",
        "choices": {"red": {"label": {"ja": "赤", "en": "Red"}, "prompt": "korean_booth"},
                    "black": {"label": {"ja": "黒", "en": "Black"}, "prompt": "korean_booth_black"}}}}}
