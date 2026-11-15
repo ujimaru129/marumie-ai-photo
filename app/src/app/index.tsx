@@ -1,29 +1,27 @@
 // スタイル一覧（起動時の画面）。初回は年齢の確認へ
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, Wordmark } from '@/components/ui';
-import { C } from '@/constants/theme';
-import { getBalance, getStyles, hasSession, type Style } from '@/lib/api';
+import { Button, Caption, Pill, shadow, Title, Wordmark } from '@/components/ui';
+import { C, f, fl } from '@/constants/theme';
+import { API_URL, getBalance, getStyles, hasSession, type Style } from '@/lib/api';
 import { lang, t } from '@/lib/i18n';
 import { setState, useStore } from '@/lib/store';
 
-// 見本の画像ができるまでの仮の色（スタイルの雰囲気に合わせる）
-const SWATCH: Record<string, string> = {
-  digicam_flash: '#2B2A33', golden_hour: '#C98A4B', day_flash: '#D9D2C3', neon_night: '#3B2147', korean_studio: '#EDE6DA',
-  cafe_window: '#B9A38A', photobooth: '#E8E2D6', magazine_cover: '#C9C2B6', tokyo_crossing: '#59606B', strobe_black: '#141414',
-  rooftop_night: '#2C3A55', beach_day: '#9CC3CF', sakura: '#E9C8CF', korean_booth: '#7D1A1A',
-};
+// 「いま人気」に大きく出すスタイル（運用で入れ替える想定）
+const FEATURED = ['korean_booth', 'magazine_cover', 'digicam_flash'];
 
 export default function Styles() {
   const styles = useStore((s) => s.styles);
   const balance = useStore((s) => s.balance);
-  const [kind, setKind] = useState<'effect' | 'template'>('template');
+  const [kind, setKind] = useState<'template' | 'effect'>('template');
   const [error, setError] = useState(false);
   const [ready, setReady] = useState(false);
+  const { width } = useWindowDimensions();
 
   const load = async () => {
     setError(false);
@@ -45,64 +43,96 @@ export default function Styles() {
     })();
   }, []);
 
-  if (!ready) return <View style={{ flex: 1, backgroundColor: C.paper }} />;
+  if (!ready) return <View style={{ flex: 1, backgroundColor: C.bg }} />;
 
+  const featured = FEATURED.map((id) => styles.find((x) => x.id === id)).filter((x): x is Style => !!x);
   const list = styles.filter((s) => s.kind === kind);
+  const cardW = (width - 24 * 2 - 14) / 2;
+
   return (
     <SafeAreaView style={s.wrap} edges={['top']}>
-      <View style={s.header}>
+      <View style={s.bar}>
         <Wordmark />
         {balance && (
-          <Text style={s.balance}>{balance.freeLeft > 0 ? t.freeLeft(balance.freeLeft) : t.credits(balance.credits)}</Text>
+          <View style={s.balance}>
+            <Text style={[f(700), { fontSize: 12, color: C.ink }]}>{balance.freeLeft > 0 ? t.freeLeft(balance.freeLeft) : t.credits(balance.credits)}</Text>
+          </View>
         )}
       </View>
-      <View style={s.tabs}>
-        {(['template', 'effect'] as const).map((k) => (
-          <Pressable key={k} onPress={() => setKind(k)} style={[s.tab, kind === k && s.tabOn]}>
-            <Text style={[s.tabText, kind === k && { color: C.paper }]}>{k === 'effect' ? t.effects : t.templates}</Text>
-          </Pressable>
-        ))}
-      </View>
+
       {error ? (
         <View style={s.center}>
-          <Text style={s.err}>{t.errNetwork}</Text>
-          <Button title={t.again} kind="ghost" onPress={load} />
+          <Text style={[f(700), { fontSize: 15, color: C.ink, textAlign: 'center' }]}>{t.errNetwork}</Text>
+          <Button title={t.again} kind="soft" onPress={load} style={{ alignSelf: 'stretch' }} />
         </View>
       ) : styles.length === 0 ? (
         <View style={s.center}><ActivityIndicator color={C.ink} /></View>
       ) : (
-        <FlatList
-          data={list}
-          keyExtractor={(x) => x.id}
-          numColumns={2}
-          contentContainerStyle={{ padding: 12, paddingBottom: 40 }}
-          renderItem={({ item }) => <Card style={item} />}
-        />
+        <ScrollView contentContainerStyle={{ paddingBottom: 48 }} showsVerticalScrollIndicator={false}>
+          <Title title={t.stylesTitle2} sub={t.stylesSub} style={{ paddingHorizontal: 24, marginTop: 18 }} />
+
+          <Caption style={{ marginHorizontal: 24, marginTop: 26, marginBottom: 12 }}>{t.featured}</Caption>
+          <FlatList
+            horizontal
+            data={featured}
+            keyExtractor={(x) => x.id}
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={width * 0.72 + 14}
+            decelerationRate="fast"
+            contentContainerStyle={{ paddingHorizontal: 24, gap: 14, paddingBottom: 24 }}
+            renderItem={({ item }) => <Hero style={item} w={width * 0.72} />}
+          />
+
+          <View style={s.tabs}>
+            <Pill label={t.templates} on={kind === 'template'} onPress={() => setKind('template')} />
+            <Pill label={t.effects} on={kind === 'effect'} onPress={() => setKind('effect')} />
+          </View>
+          <View style={s.grid}>
+            {list.map((item) => <Card key={item.id} style={item} w={cardW} />)}
+          </View>
+        </ScrollView>
       )}
     </SafeAreaView>
   );
 }
 
-function Card({ style }: { style: Style }) {
+const open = (id: string) => router.push({ pathname: '/style/[id]', params: { id } });
+
+function Hero({ style, w }: { style: Style; w: number }) {
   return (
-    <Pressable onPress={() => router.push({ pathname: '/style/[id]', params: { id: style.id } })} style={({ pressed }) => [s.card, pressed && { opacity: 0.8 }]}>
-      <View style={[s.swatch, { backgroundColor: SWATCH[style.id] ?? C.line }]} />
-      <Text style={s.name} numberOfLines={1}>{style.name[lang]}</Text>
+    <Pressable onPress={() => open(style.id)} style={({ pressed }) => [{ width: w }, pressed && { transform: [{ scale: 0.98 }] }]}>
+      <View style={[shadow, { borderRadius: 22 }]}>
+        <View style={s.heroImg}>
+          <Image source={{ uri: API_URL + style.sample }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+        </View>
+      </View>
+      <Text style={[fl(800), { fontSize: 20, color: C.ink, marginTop: 14, letterSpacing: -0.3 }]}>{style.name.en}</Text>
+      <Text style={[f(500), { fontSize: 13, color: C.sub, marginTop: 2 }]} numberOfLines={1}>{style.desc?.[lang] ?? style.name[lang]}</Text>
+    </Pressable>
+  );
+}
+
+function Card({ style, w }: { style: Style; w: number }) {
+  return (
+    <Pressable onPress={() => open(style.id)} style={({ pressed }) => [{ width: w, marginBottom: 22 }, pressed && { transform: [{ scale: 0.98 }] }]}>
+      <View style={[shadow, { borderRadius: 16, shadowOpacity: 0.1, shadowRadius: 12 }]}>
+        <View style={s.cardImg}>
+          <Image source={{ uri: API_URL + style.sample }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+        </View>
+      </View>
+      <Text style={[fl(800), { fontSize: 15, color: C.ink, marginTop: 10, letterSpacing: -0.2 }]} numberOfLines={1}>{style.name.en}</Text>
+      {lang === 'ja' && <Text style={[f(500), { fontSize: 12, color: C.sub, marginTop: 1 }]} numberOfLines={1}>{style.name.ja}</Text>}
     </Pressable>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: C.paper },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 8 },
-  balance: { fontSize: 12, color: C.ink, borderWidth: 1, borderColor: C.ink, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
-  tabs: { flexDirection: 'row', gap: 8, paddingHorizontal: 20, marginTop: 16 },
-  tab: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 18, borderWidth: 1, borderColor: C.ink },
-  tabOn: { backgroundColor: C.ink },
-  tabText: { fontSize: 14, color: C.ink, fontWeight: '600' },
+  wrap: { flex: 1, backgroundColor: C.bg },
+  bar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, height: 48 },
+  balance: { backgroundColor: C.fill, borderRadius: 14, paddingHorizontal: 12, height: 28, justifyContent: 'center' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24 },
-  err: { fontSize: 14, color: C.ink, textAlign: 'center' },
-  card: { flex: 1, margin: 6 },
-  swatch: { aspectRatio: 3 / 4, borderRadius: 14 },
-  name: { fontSize: 14, color: C.ink, marginTop: 6, fontWeight: '600' },
+  heroImg: { aspectRatio: 4 / 5, borderRadius: 22, backgroundColor: C.fill, overflow: 'hidden' },
+  tabs: { flexDirection: 'row', gap: 8, paddingHorizontal: 24, marginTop: 8, marginBottom: 18 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', paddingHorizontal: 24 },
+  cardImg: { aspectRatio: 3 / 4, borderRadius: 16, backgroundColor: C.fill, overflow: 'hidden' },
 });

@@ -32,7 +32,7 @@ function finish(promptName) {
 }
 
 const styles = catalog.styles.map((s) => {
-  const out = { id: s.id, kind: s.kind, name: s.name, post: s.post ?? null, mirror: !!s.mirror, season: s.season ?? null };
+  const out = { id: s.id, kind: s.kind, name: s.name, desc: s.desc ?? null, post: s.post ?? null, mirror: !!s.mirror, season: s.season ?? null };
   if (s.options) {
     out.options = {};
     for (const [key, opt] of Object.entries(s.options)) {

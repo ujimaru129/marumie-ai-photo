@@ -1,10 +1,11 @@
 // 生成中: 写真を下ごしらえして送り、2枚の結果を端末に保存してから結果の画面へ
+import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 
-import { Button } from '@/components/ui';
-import { C } from '@/constants/theme';
+import { Button, shadow } from '@/components/ui';
+import { C, f } from '@/constants/theme';
 import { ApiError, downloadResult, generate } from '@/lib/api';
 import { removeFile, storeResult } from '@/lib/files';
 import { t } from '@/lib/i18n';
@@ -14,16 +15,13 @@ import { getState, setState } from '@/lib/store';
 export default function Generating() {
   const params = useLocalSearchParams<{ style: string; options: string }>();
   const [error, setError] = useState<string | null>(null);
-  const [fade] = useState(() => new Animated.Value(0));
+  const [veil] = useState(() => new Animated.Value(1));
+  const [slide] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
-    // チェキが浮かび上がる演出（白から少しずつ色が出る）
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(fade, { toValue: 1, duration: 2200, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
-        Animated.timing(fade, { toValue: 0.15, duration: 1400, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
-      ]),
-    ).start();
+    // 20秒かけて白から写真が浮かび上がる。下の線は行ったり来たり
+    Animated.timing(veil, { toValue: 0.15, duration: 20000, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
+    Animated.loop(Animated.timing(slide, { toValue: 1, duration: 1400, easing: Easing.inOut(Easing.quad), useNativeDriver: true })).start();
 
     let alive = true;
     const { picked, styles } = getState();
@@ -44,29 +42,36 @@ export default function Generating() {
       setState({ balance: { freeLeft: g.freeLeft, credits: g.credits }, result: { id: g.id, style, original: picked.uri, images } });
       if (alive) router.replace('/result');
     })().catch((e) => {
-      console.warn('generate failed', e);
       const code = e instanceof ApiError ? e.code : 'failed';
       if (alive) setError(code === 'no_credits' ? t.errNoCredits : code === 'blocked' ? t.errBlocked : code === 'network' ? t.errNetwork : t.errFailed);
     });
     return () => {
       alive = false;
     };
-  }, [fade, params.style, params.options]);
+  }, [veil, slide, params.style, params.options]);
 
+  const picked = getState().picked;
   return (
     <View style={s.wrap}>
-      <View style={s.cheki}>
-        <Animated.View style={[s.photo, { opacity: fade }]} />
+      <View style={[s.cheki, shadow]}>
+        <View style={s.photo}>
+          {picked && <Image source={{ uri: picked.uri }} style={StyleSheet.absoluteFill} contentFit="cover" blurRadius={6} />}
+          {/* 白から少しずつ写真が浮かび上がる（チェキの現像） */}
+          <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: '#F4F2EE', opacity: veil }]} />
+        </View>
       </View>
       {error ? (
         <>
-          <Text style={s.err}>{error}</Text>
-          <Button title={t.cancel} kind="ghost" onPress={() => router.back()} style={{ marginTop: 16, alignSelf: 'stretch' }} />
+          <Text style={[f(700), s.err]}>{error}</Text>
+          <Button title={t.cancel} kind="soft" onPress={() => router.back()} style={{ marginTop: 20, alignSelf: 'stretch' }} />
         </>
       ) : (
         <>
-          <Text style={s.title}>{t.developing}</Text>
-          <Text style={s.sub}>{t.developingSub}</Text>
+          <Text style={[f(800), s.title]}>{t.developing}</Text>
+          <View style={s.track}>
+            <Animated.View style={[s.bar, { transform: [{ translateX: slide.interpolate({ inputRange: [0, 1], outputRange: [-120, 240] }) }] }]} />
+          </View>
+          <Text style={[f(500), s.sub]}>{t.developingSub}</Text>
         </>
       )}
     </View>
@@ -74,10 +79,12 @@ export default function Generating() {
 }
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, backgroundColor: C.paper },
-  cheki: { width: 200, backgroundColor: '#fff', padding: 12, paddingBottom: 44, borderRadius: 4, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 6 },
-  photo: { aspectRatio: 3 / 4, backgroundColor: '#3A3530' },
-  title: { fontSize: 18, fontWeight: '600', color: C.ink, marginTop: 32 },
-  sub: { fontSize: 13, color: C.sub, marginTop: 8 },
-  err: { fontSize: 15, color: C.ink, marginTop: 32, textAlign: 'center', lineHeight: 22 },
+  wrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, backgroundColor: C.bg },
+  cheki: { width: 220, backgroundColor: '#fff', padding: 12, paddingBottom: 48, borderRadius: 3, transform: [{ rotate: '-3deg' }] },
+  photo: { aspectRatio: 3 / 4, backgroundColor: '#E9E6E0', overflow: 'hidden' },
+  title: { fontSize: 24, color: C.ink, marginTop: 44, letterSpacing: -0.4 },
+  track: { width: 240, height: 3, borderRadius: 2, backgroundColor: C.fill, marginTop: 18, overflow: 'hidden' },
+  bar: { width: 120, height: 3, borderRadius: 2, backgroundColor: C.ink },
+  sub: { fontSize: 13, color: C.sub, marginTop: 14 },
+  err: { fontSize: 15, lineHeight: 23, color: C.ink, marginTop: 40, textAlign: 'center' },
 });

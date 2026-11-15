@@ -1,4 +1,4 @@
-// スタイルの画面: 枠の色などを選ぶ → 写真を選ぶ／撮る →「本人の写真です」を確認 → 作成
+// スタイルの画面: 見本と説明 → 枠の色などを選ぶ → 写真を選ぶ／撮る →「本人の写真です」を確認 → 作成
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -6,8 +6,9 @@ import { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, Check } from '@/components/ui';
-import { C } from '@/constants/theme';
+import { Button, Caption, Check, Pill, shadow } from '@/components/ui';
+import { C, f, fl } from '@/constants/theme';
+import { API_URL } from '@/lib/api';
 import { lang, t } from '@/lib/i18n';
 import { setState, useStore } from '@/lib/store';
 
@@ -22,6 +23,7 @@ export default function StyleScreen() {
   const [own, setOwn] = useState(false);
 
   if (!style) return null;
+  const free = (balance?.freeLeft ?? 0) > 0;
 
   const pick = async (camera: boolean) => {
     const perm = camera ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -39,47 +41,76 @@ export default function StyleScreen() {
   };
 
   return (
-    <SafeAreaView style={s.wrap}>
-      <Pressable onPress={() => router.back()} hitSlop={12}><Text style={s.back}>‹</Text></Pressable>
-      <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
-        <Text style={s.title}>{style.name[lang]}</Text>
+    <SafeAreaView style={s.wrap} edges={['top', 'bottom']}>
+      <View style={s.bar}>
+        <Pressable onPress={() => router.back()} hitSlop={12} style={s.back}>
+          <Text style={[fl(700), { fontSize: 20, color: C.ink, marginTop: -2 }]}>‹</Text>
+        </Pressable>
+      </View>
+      <ScrollView contentContainerStyle={{ paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
+        <View style={s.top}>
+          <View style={[shadow, { borderRadius: 18, width: '46%' }]}>
+            <View style={s.sample}>
+              <Image source={{ uri: API_URL + style.sample }} style={StyleSheet.absoluteFill} contentFit="cover" />
+            </View>
+          </View>
+          <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+            <Text style={[fl(800), s.name]}>{style.name.en}</Text>
+            {lang === 'ja' && <Text style={[f(700), { fontSize: 14, color: C.ink, marginTop: 2 }]}>{style.name.ja}</Text>}
+            {style.desc && <Text style={[f(500), { fontSize: 13, lineHeight: 19, color: C.sub, marginTop: 8 }]}>{style.desc[lang]}</Text>}
+          </View>
+        </View>
 
         {Object.entries(style.options ?? {}).map(([key, opt]) => (
-          <View key={key} style={{ marginTop: 16 }}>
-            <Text style={s.label}>{opt.label[lang]}</Text>
+          <View key={key} style={{ paddingHorizontal: 24, marginTop: 26 }}>
+            <Caption>{opt.label[lang]}</Caption>
             <View style={s.row}>
               {Object.entries(opt.choices).map(([cid, c]) => (
-                <Pressable key={cid} onPress={() => setOptions({ ...options, [key]: cid })} style={[s.chip, options[key] === cid && s.chipOn]}>
-                  <Text style={[s.chipText, options[key] === cid && { color: C.paper }]}>{c.label[lang]}</Text>
-                </Pressable>
+                <Pill key={cid} label={c.label[lang]} on={options[key] === cid} onPress={() => setOptions({ ...options, [key]: cid })} />
               ))}
             </View>
           </View>
         ))}
 
-        <View style={s.photo}>
-          {picked ? <Image source={{ uri: picked.uri }} style={StyleSheet.absoluteFill} contentFit="cover" /> : <Text style={s.hint}>{t.pickPhoto}</Text>}
-        </View>
-        <View style={[s.row, { marginTop: 12 }]}>
-          <Button title={t.pickPhoto} kind="ghost" onPress={() => pick(false)} style={{ flex: 1 }} />
-          <Button title={t.takePhoto} kind="ghost" onPress={() => pick(true)} style={{ flex: 1 }} />
+        <View style={{ paddingHorizontal: 24, marginTop: 26 }}>
+          <Caption>{t.yourPhoto}</Caption>
+          <View style={s.photo}>
+            {picked ? (
+              <Image source={{ uri: picked.uri }} style={StyleSheet.absoluteFill} contentFit="cover" />
+            ) : (
+              <Text style={[f(500), { fontSize: 13, color: C.sub }]}>{t.photoHint}</Text>
+            )}
+          </View>
+          <View style={[s.row, { marginTop: 10 }]}>
+            <Button title={t.pickPhoto} kind="soft" onPress={() => pick(false)} style={{ flex: 1, minHeight: 48 }} />
+            <Button title={t.takePhoto} kind="soft" onPress={() => pick(true)} style={{ flex: 1, minHeight: 48 }} />
+          </View>
         </View>
       </ScrollView>
-      <Check checked={own} label={t.ownPhoto} onToggle={() => setOwn(!own)} />
-      <Button title={t.create} onPress={create} disabled={!picked || !own} style={{ marginTop: 8 }} />
+
+      <View style={s.footer}>
+        <Check checked={own} label={t.ownPhoto} onToggle={() => setOwn(!own)} />
+        <Button
+          title={free ? t.createFree : t.createCredit}
+          sub={free ? t.createFreeSub : t.createCreditSub}
+          onPress={create}
+          disabled={!picked || !own}
+        />
+        <Text style={[f(500), s.note]}>{t.sendNote}</Text>
+      </View>
     </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, paddingHorizontal: 20, paddingBottom: 16, backgroundColor: C.paper },
-  back: { fontSize: 34, color: C.ink, lineHeight: 40 },
-  title: { fontSize: 26, fontWeight: '700', color: C.ink },
-  label: { fontSize: 13, color: C.sub, marginBottom: 8 },
-  row: { flexDirection: 'row', gap: 10 },
-  chip: { paddingHorizontal: 18, paddingVertical: 8, borderRadius: 18, borderWidth: 1, borderColor: C.ink },
-  chipOn: { backgroundColor: C.ink },
-  chipText: { fontSize: 14, color: C.ink },
-  photo: { marginTop: 20, aspectRatio: 3 / 4, borderRadius: 16, backgroundColor: C.line, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
-  hint: { color: C.sub },
+  wrap: { flex: 1, backgroundColor: C.bg },
+  bar: { height: 48, paddingHorizontal: 16, justifyContent: 'center' },
+  back: { width: 36, height: 36, borderRadius: 18, backgroundColor: C.fill, alignItems: 'center', justifyContent: 'center' },
+  top: { flexDirection: 'row', gap: 18, paddingHorizontal: 24, marginTop: 8 },
+  sample: { aspectRatio: 3 / 4, borderRadius: 18, overflow: 'hidden', backgroundColor: C.fill },
+  name: { fontSize: 26, lineHeight: 30, letterSpacing: -0.6, color: C.ink },
+  row: { flexDirection: 'row', gap: 8, marginTop: 10 },
+  photo: { marginTop: 10, aspectRatio: 4 / 3, borderRadius: 18, backgroundColor: C.fill, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  footer: { paddingHorizontal: 24, paddingTop: 4, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.line },
+  note: { fontSize: 10, lineHeight: 15, color: C.sub, textAlign: 'center', marginTop: 8 },
 });

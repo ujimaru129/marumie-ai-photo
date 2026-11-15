@@ -15,6 +15,8 @@ export type Style = {
   id: string;
   kind: 'effect' | 'template';
   name: Label;
+  desc: Label | null;
+  sample: string;
   post: 'cover' | 'booth' | null;
   mirror: boolean;
   season: string | null;

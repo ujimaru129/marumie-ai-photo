@@ -78,7 +78,7 @@ async function auth(req: Request, env: Env): Promise<Device> {
 /** アプリに返すスタイルの一覧（指示文は入れない） */
 function publicStyles() {
   return STYLES.map((s: any) => {
-    const out: any = { id: s.id, kind: s.kind, name: s.name, post: s.post, mirror: s.mirror, season: s.season };
+    const out: any = { id: s.id, kind: s.kind, name: s.name, desc: s.desc, post: s.post, mirror: s.mirror, season: s.season, sample: `/v1/samples/${s.id}` };
     if (s.options) {
       out.options = {};
       for (const [k, o] of Object.entries<any>(s.options)) {
@@ -141,6 +141,14 @@ async function handle(req: Request, env: Env, ctx: ExecutionContext): Promise<Re
       "INSERT INTO devices (id, token_hash, created_at, adult_confirmed_at, consent_version, consent_at, free_left, credits) VALUES (?, ?, ?, ?, ?, ?, ?, 0)",
     ).bind(id, await sha256(token), now, now, CONSENT_VERSION, now, free).run();
     return json({ deviceId: id, token, freeLeft: free, credits: 0 });
+  }
+
+  // スタイルの見本画像（R2 の samples/<id>.jpg。誰でも見られる）
+  const sample = /^\/v1\/samples\/([a-z_]+)$/.exec(p);
+  if (req.method === "GET" && sample) {
+    const obj = await env.RESULTS.get(`samples/${sample[1]}.jpg`);
+    if (!obj) throw new HttpError(404, "not_found");
+    return new Response(obj.body, { headers: { "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=86400" } });
   }
 
   if (req.method === "GET" && p === "/v1/styles") {

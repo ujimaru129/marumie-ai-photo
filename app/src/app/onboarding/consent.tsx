@@ -1,11 +1,11 @@
 // 初回 2/2: 外部の AI に写真を送ることへの同意（App Store 審査ガイドライン 5.1.2、GDPR）→ 端末を登録
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, Check, Wordmark } from '@/components/ui';
-import { C } from '@/constants/theme';
+import { Button, Check, Title, Wordmark } from '@/components/ui';
+import { C, f, fl } from '@/constants/theme';
 import { register } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { setState } from '@/lib/store';
@@ -29,18 +29,28 @@ export default function Consent() {
   return (
     <SafeAreaView style={s.wrap}>
       <Wordmark />
-      <Text style={s.title}>{t.consentTitle}</Text>
-      <ScrollView style={{ flex: 1 }}>
-        <Text style={s.body}>{t.consentBody}</Text>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 28, paddingBottom: 16 }} showsVerticalScrollIndicator={false}>
+        <Title title={t.consentTitle} sub={t.consentSub} />
+        <View style={{ marginTop: 24, gap: 10 }}>
+          {t.consentItems.map(([head, body], i) => (
+            <View key={head} style={s.item}>
+              <Text style={[fl(800), s.num]}>{String(i + 1).padStart(2, '0')}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={[f(800), { fontSize: 15, color: C.ink }]}>{head}</Text>
+                <Text style={[f(500), { fontSize: 13, lineHeight: 20, color: C.sub, marginTop: 3 }]}>{body}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
       </ScrollView>
       <Check checked={ok} label={t.consentCheck} onToggle={() => setOk(!ok)} />
-      <Button title={t.agree} onPress={agree} disabled={!ok} busy={busy} style={{ marginTop: 12 }} />
+      <Button title={t.agree} onPress={agree} disabled={!ok} busy={busy} style={{ marginTop: 6 }} />
     </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, padding: 24, backgroundColor: C.paper },
-  title: { fontSize: 26, fontWeight: '700', color: C.ink, marginTop: 32, marginBottom: 12 },
-  body: { fontSize: 15, lineHeight: 24, color: C.ink },
+  wrap: { flex: 1, paddingHorizontal: 24, paddingTop: 12, paddingBottom: 16, backgroundColor: C.bg },
+  item: { flexDirection: 'row', gap: 14, backgroundColor: C.fill, borderRadius: 18, padding: 16 },
+  num: { fontSize: 13, color: C.red, marginTop: 2, letterSpacing: 0.5 },
 });

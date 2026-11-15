@@ -7,8 +7,8 @@ import { useState } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button } from '@/components/ui';
-import { C } from '@/constants/theme';
+import { Button, RoundAction, shadow } from '@/components/ui';
+import { C, f, fl } from '@/constants/theme';
 import { report } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { saveToPhotos } from '@/lib/save';
@@ -20,6 +20,9 @@ export default function Result() {
   const [hold, setHold] = useState(false);
   const [reporting, setReporting] = useState(false);
   const [saving, setSaving] = useState(false);
+  // 写真の縦横比に合わせてカードの大きさを決める（切り取らずに全体を見せる）
+  const [box, setBox] = useState({ w: 0, h: 0 });
+  const [ratio, setRatio] = useState(3 / 4);
 
   if (!result) return null;
   const current = result.images[sel] ?? result.images[0];
@@ -32,9 +35,7 @@ export default function Result() {
       setSaving(false);
     }
   };
-
   const share = () => Sharing.shareAsync(current.uri, { mimeType: 'image/jpeg', UTI: 'public.jpeg' });
-
   const send = async (reason: string) => {
     setReporting(false);
     try {
@@ -47,17 +48,35 @@ export default function Result() {
 
   return (
     <SafeAreaView style={s.wrap}>
-      <View style={s.top}>
-        <Pressable onPress={() => router.dismissTo('/')} hitSlop={12}><Text style={s.close}>×</Text></Pressable>
-        <Text style={s.pick}>{result.images.length > 1 ? t.pickOne : ''}</Text>
-        <View style={{ width: 24 }} />
+      <View style={s.bar}>
+        <Pressable onPress={() => router.dismissTo('/')} hitSlop={12} style={s.close}>
+          <Text style={[fl(600), { fontSize: 18, color: C.ink, marginTop: -1 }]}>✕</Text>
+        </Pressable>
+        <View style={{ alignItems: 'center' }}>
+          <Text style={[fl(800), { fontSize: 15, color: C.ink, letterSpacing: -0.2 }]}>{result.style.name.en}</Text>
+          {result.images.length > 1 && <Text style={[f(500), { fontSize: 11, color: C.sub }]}>{t.pickOne}</Text>}
+        </View>
+        <View style={{ width: 36 }} />
       </View>
 
-      <Pressable style={s.main} onPressIn={() => setHold(true)} onPressOut={() => setHold(false)}>
-        <Image source={{ uri: hold ? result.original : current.uri }} style={StyleSheet.absoluteFill} contentFit="contain" transition={0} />
-        {!hold && <Text style={s.ai}>{t.aiLabel}</Text>}
-      </Pressable>
-      <Text style={s.hint}>{t.holdToCompare}</Text>
+      <View style={s.stage} onLayout={(e) => setBox({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
+      <View style={[shadow, { borderRadius: 22, width: Math.min(box.w, box.h * ratio), height: Math.min(box.h, box.w / ratio) }]}>
+        <Pressable style={s.main} onPressIn={() => setHold(true)} onPressOut={() => setHold(false)}>
+          <Image
+            source={{ uri: hold ? result.original : current.uri }}
+            style={StyleSheet.absoluteFill}
+            contentFit={hold ? 'cover' : 'contain'}
+            transition={0}
+            onLoad={(e) => !hold && setRatio(e.source.width / e.source.height)}
+          />
+          <View style={s.holdTag}>
+            <Text style={[fl(800), { fontSize: 10, letterSpacing: 1, color: C.ink }]}>HOLD</Text>
+            <Text style={[f(700), { fontSize: 11, color: C.ink }]}>{t.hold}</Text>
+          </View>
+          {!hold && <Text style={[fl(700), s.ai]}>AI · MARUMIE</Text>}
+        </Pressable>
+      </View>
+      </View>
 
       {result.images.length > 1 && (
         <View style={s.thumbs}>
@@ -69,46 +88,50 @@ export default function Result() {
         </View>
       )}
 
-      <View style={s.row}>
-        <Button title={t.save} onPress={save} busy={saving} style={{ flex: 1 }} />
-        <Button title={t.share} kind="ghost" onPress={share} style={{ flex: 1 }} />
+      <View style={s.actions}>
+        <RoundAction icon="↓" label={t.save} onPress={save} dark busy={saving} />
+        <RoundAction icon="↗" label={t.share} onPress={share} />
+        <RoundAction icon="↻" label={t.again} onPress={() => router.dismissTo({ pathname: '/style/[id]', params: { id: result.style.id } })} />
       </View>
-      <View style={[s.row, { marginTop: 10 }]}>
-        <Button title={t.again} kind="ghost" onPress={() => router.dismissTo({ pathname: '/style/[id]', params: { id: result.style.id } })} style={{ flex: 1 }} />
-      </View>
-      <Pressable onPress={() => setReporting(true)} hitSlop={8}><Text style={s.report}>{t.report}</Text></Pressable>
+      <Pressable onPress={() => setReporting(true)} hitSlop={8}>
+        <Text style={[f(500), s.report]}>{t.report}</Text>
+      </Pressable>
 
-      <Modal visible={reporting} transparent animationType="fade" onRequestClose={() => setReporting(false)}>
-        <View style={s.backdrop}>
-          <View style={s.sheet}>
-            <Text style={s.sheetTitle}>{t.reportTitle}</Text>
-            {Object.entries(t.reasons).map(([k, label]) => (
-              <Pressable key={k} onPress={() => send(k)} style={s.reason}><Text style={s.reasonText}>{label}</Text></Pressable>
-            ))}
-            <Button title={t.cancel} kind="ghost" onPress={() => setReporting(false)} style={{ marginTop: 12 }} />
-          </View>
-        </View>
+      <Modal visible={reporting} transparent animationType="slide" onRequestClose={() => setReporting(false)}>
+        <Pressable style={s.backdrop} onPress={() => setReporting(false)}>
+          <Pressable style={s.sheet}>
+            <View style={s.grabber} />
+            <Text style={[f(800), { fontSize: 22, color: C.ink, letterSpacing: -0.3, marginBottom: 12 }]}>{t.reportTitle}</Text>
+            <View style={{ backgroundColor: C.fill, borderRadius: 16 }}>
+              {Object.entries(t.reasons).map(([k, label], i) => (
+                <Pressable key={k} onPress={() => send(k)} style={[s.reason, i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: C.line }]}>
+                  <Text style={[f(700), { fontSize: 15, color: C.ink }]}>{label}</Text>
+                </Pressable>
+              ))}
+            </View>
+            <Button title={t.cancel} kind="soft" onPress={() => setReporting(false)} style={{ marginTop: 12 }} />
+          </Pressable>
+        </Pressable>
       </Modal>
     </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, paddingHorizontal: 20, paddingBottom: 12, backgroundColor: C.paper },
-  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 44 },
-  close: { fontSize: 30, color: C.ink },
-  pick: { fontSize: 14, color: C.ink, fontWeight: '600' },
-  main: { flex: 1, borderRadius: 12, overflow: 'hidden', backgroundColor: C.line },
-  ai: { position: 'absolute', right: 10, bottom: 10, fontSize: 11, color: '#fff', backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, overflow: 'hidden' },
-  hint: { fontSize: 12, color: C.sub, textAlign: 'center', marginTop: 6 },
-  thumbs: { flexDirection: 'row', justifyContent: 'center', gap: 12, marginVertical: 12 },
-  thumb: { width: 64, height: 84, borderRadius: 8, overflow: 'hidden', borderWidth: 2, borderColor: 'transparent' },
-  thumbOn: { borderColor: C.ink },
-  row: { flexDirection: 'row', gap: 10 },
-  report: { textAlign: 'center', color: C.sub, fontSize: 13, marginTop: 14, textDecorationLine: 'underline' },
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: C.paper, padding: 20, paddingBottom: 36, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
-  sheetTitle: { fontSize: 18, fontWeight: '700', color: C.ink, marginBottom: 8 },
-  reason: { paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.line },
-  reasonText: { fontSize: 15, color: C.ink },
+  wrap: { flex: 1, paddingHorizontal: 20, paddingBottom: 8, backgroundColor: C.bg },
+  bar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 52 },
+  close: { width: 36, height: 36, borderRadius: 18, backgroundColor: C.fill, alignItems: 'center', justifyContent: 'center' },
+  stage: { flex: 1, marginTop: 6, alignItems: 'center', justifyContent: 'center' },
+  main: { flex: 1, borderRadius: 22, overflow: 'hidden', backgroundColor: C.fill },
+  holdTag: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 14, paddingHorizontal: 10, height: 28 },
+  ai: { position: 'absolute', right: 14, bottom: 12, fontSize: 10, letterSpacing: 1.2, color: '#fff', opacity: 0.85 },
+  thumbs: { flexDirection: 'row', justifyContent: 'center', gap: 10, marginTop: 16 },
+  thumb: { width: 54, height: 72, borderRadius: 12, overflow: 'hidden', opacity: 0.45 },
+  thumbOn: { opacity: 1, borderWidth: 2, borderColor: C.ink },
+  actions: { flexDirection: 'row', justifyContent: 'center', gap: 18, marginTop: 18 },
+  report: { textAlign: 'center', color: C.sub, fontSize: 12, marginTop: 14, marginBottom: 4, textDecorationLine: 'underline' },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' },
+  sheet: { backgroundColor: C.bg, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 36, borderTopLeftRadius: 28, borderTopRightRadius: 28 },
+  grabber: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: C.line, marginBottom: 14 },
+  reason: { paddingVertical: 15, paddingHorizontal: 16 },
 });
