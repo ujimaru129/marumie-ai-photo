@@ -3,6 +3,7 @@
 使い方（リポジトリの eval フォルダから）:
   python3 run.py --inputs inputs --out out --models gemini,meta --styles all --workers 3
   python3 run.py ... --photos p01,p09 --styles digicam_flash      # 一部だけ
+  python3 run.py ... --max-usd 5                                   # 見込み額の上限（初期値 $2。超えるなら実行しない）
 すでに出力がある組み合わせは飛ばす（途中で止まっても、もう一度実行すれば続きから）。
 
 inputs/ … 長辺1024px・EXIF を消した JPEG（prep.py で作る）。写真はリポジトリに入れない（.gitignore）
@@ -12,10 +13,13 @@ import argparse
 import concurrent.futures as cf
 import csv
 import datetime
+import io
 import glob
 import json
 import os
 import threading
+
+from PIL import Image
 
 from models import MODELS, PRICE_USD
 
@@ -39,6 +43,7 @@ def main():
     ap.add_argument("--styles", default="all")
     ap.add_argument("--photos", default="all")
     ap.add_argument("--workers", type=int, default=3)
+    ap.add_argument("--max-usd", type=float, default=2.0)
     a = ap.parse_args()
 
     photos = sorted(glob.glob(os.path.join(a.inputs, "*.jpg")))
@@ -59,13 +64,18 @@ def main():
                 dst = os.path.join(a.out, m, f"{name}__{s}.png")
                 if not os.path.exists(dst):
                     jobs.append((m, s, p, name, dst))
-    print(f"生成する組み合わせ: {len(jobs)} 件（写真 {len(photos)} × スタイル {len(styles)} × モデル {len(models)}、済みは飛ばす）")
+    est = sum(PRICE_USD[j[0]] for j in jobs)
+    print(f"生成する組み合わせ: {len(jobs)} 件（写真 {len(photos)} × スタイル {len(styles)} × モデル {len(models)}、済みは飛ばす）"
+          f" 見込み額 ${est:.2f}")
+    if est > a.max_usd:
+        raise SystemExit(f"見込み額 ${est:.2f} が上限 ${a.max_usd:.2f} を超えるので実行しない（--max-usd で変えられる）")
 
     def work(job):
         m, s, p, name, dst = job
         img, info = MODELS[m](open(p, "rb").read(), styles[s])
         if img:
-            open(dst, "wb").write(img)
+            # モデルによって形式が違う（Gemini は PNG、Muse Image は WebP）ので PNG にそろえる
+            Image.open(io.BytesIO(img)).save(dst, "PNG")
         row = {"time": datetime.datetime.now().isoformat(timespec="seconds"), "model": m, "style": s, "photo": name,
                "status": info["status"], "sec": info["sec"], "usd": PRICE_USD[m] if info["status"] == "ok" else 0,
                "usage": json.dumps(info.get("usage"), ensure_ascii=False) if info.get("usage") else "",
