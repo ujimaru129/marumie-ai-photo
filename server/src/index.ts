@@ -24,6 +24,8 @@ export interface Env extends ModelEnv {
   CREDITS_PER_GENERATION: string;
   FREE_GENERATIONS: string;
   META_REASONING: string;
+  /** 開発時だけ: Web 版の画面確認のために許可するオリジン（本番は設定しない。アプリはネイティブなので CORS は不要） */
+  DEV_ALLOW_ORIGIN?: string;
 }
 
 const CONSENT_VERSION = "2026-11";
@@ -219,12 +221,24 @@ async function handle(req: Request, env: Env, ctx: ExecutionContext): Promise<Re
 
 export default {
   async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    try {
-      return await handle(req, env, ctx);
-    } catch (e) {
-      if (e instanceof HttpError) return json({ error: e.code }, e.status);
-      console.error(e);
-      return json({ error: "internal" }, 500);
+    const origin = env.DEV_ALLOW_ORIGIN;
+    if (origin && req.method === "OPTIONS") {
+      return new Response(null, { status: 204, headers: { "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Headers": "Authorization, Content-Type", "Access-Control-Allow-Methods": "GET, POST" } });
     }
+    let res: Response;
+    try {
+      res = await handle(req, env, ctx);
+    } catch (e) {
+      if (e instanceof HttpError) res = json({ error: e.code }, e.status);
+      else {
+        console.error(e);
+        res = json({ error: "internal" }, 500);
+      }
+    }
+    if (origin) {
+      res = new Response(res.body, res);
+      res.headers.set("Access-Control-Allow-Origin", origin);
+    }
+    return res;
   },
 } satisfies ExportedHandler<Env>;
