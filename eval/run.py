@@ -44,6 +44,7 @@ def main():
     ap.add_argument("--photos", default="all")
     ap.add_argument("--workers", type=int, default=3)
     ap.add_argument("--max-usd", type=float, default=2.0)
+    ap.add_argument("--meta-reasoning", default=None, help="Muse Image の reasoning_strength（high / low）")
     a = ap.parse_args()
 
     photos = sorted(glob.glob(os.path.join(a.inputs, "*.jpg")))
@@ -72,7 +73,8 @@ def main():
 
     def work(job):
         m, s, p, name, dst = job
-        img, info = MODELS[m](open(p, "rb").read(), styles[s])
+        kw = {"reasoning": a.meta_reasoning} if m == "meta" and a.meta_reasoning else {}
+        img, info = MODELS[m](open(p, "rb").read(), styles[s], **kw)
         if img:
             # モデルによって形式が違う（Gemini は PNG、Muse Image は WebP）ので PNG にそろえる
             Image.open(io.BytesIO(img)).save(dst, "PNG")

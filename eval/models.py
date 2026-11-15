@@ -62,8 +62,11 @@ def gemini(image_bytes, prompt, timeout=180):
                                         "promptFeedback": r.get("promptFeedback")}, ensure_ascii=False)}
 
 
-def meta(image_bytes, prompt, timeout=300):
-    """Muse Image で編集する（OpenAI Images API と同じ形の /v1/images/edits）。"""
+def meta(image_bytes, prompt, timeout=300, reasoning=None):
+    """Muse Image で編集する（OpenAI Images API と同じ形の /v1/images/edits）。
+    reasoning: "high"（既定。何度か見直して仕上げる）/ "low"（1回で返す。速い）。料金は同じ。
+    出力の大きさはモデルで決まっていて（縦長で約1344×1792）、size は縦横比だけを決める。
+    画像検索・ウェブ検索・シェルの補助機能は使わない（時間が延びるうえ、このアプリでは不要）。"""
     b = uuid.uuid4().hex
     parts = []
 
@@ -73,6 +76,9 @@ def meta(image_bytes, prompt, timeout=300):
     field("model", META_MODEL)
     field("prompt", prompt)
     field("n", "1")
+    field("tool_enablement", json.dumps({"enable_image_search": False, "enable_web_search": False, "enable_shell": False}))
+    if reasoning:
+        field("reasoning_strength", reasoning)
     parts.append(f'--{b}\r\nContent-Disposition: form-data; name="image"; filename="in.jpg"\r\n'
                  f'Content-Type: image/jpeg\r\n\r\n'.encode() + image_bytes + b"\r\n")
     parts.append(f"--{b}--\r\n".encode())
