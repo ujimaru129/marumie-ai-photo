@@ -14,9 +14,16 @@
     "golden_hour": "night",
     "day_flash": "day",
     "korean_studio": null,
-    "cafe_window": "day",
+    "cafe_window": "night",
     "photobooth": "day",
     "magazine_cover": "day",
-    "tokyo_crossing": "day"
+    "tokyo_crossing": "day",
+    "strobe_black": null,
+    "konbini_night": "night",
+    "beach_day": "day",
+    "rooftop_night": "night",
+    "sakura": "day",
+    "y2k_bedroom": "day",
+    "purikura": null
   }
 }
