@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MARUMIE AI PHOTO 課金画面案</title>
+<!-- MARUMIE AI PHOTO の課金画面の画面案（2026-11-09、仕様まとめ 6.3 に合わせて作り直し）。
+     色はブランドカラー（Paper #F8F6EF / Ink #1A1A1A / Red #D74343 / Lime #DDE768）、書体はアプリ同梱の
+     Bodoni Moda・Jost・Noto Sans JP（assets/fonts）。写真部分はグラデーションの仮置き。 -->
+<style>
+@font-face { font-family: 'Bodoni'; src: url('fonts/BodoniModa-700.ttf'); font-weight: 700; }
+@font-face { font-family: 'Jost'; src: url('fonts/Jost-400.ttf'); font-weight: 400; }
+@font-face { font-family: 'Jost'; src: url('fonts/Jost-700.ttf'); font-weight: 700; }
+@font-face { font-family: 'NotoJP'; src: url('fonts/NotoSansJP-400.ttf'); font-weight: 400; }
+@font-face { font-family: 'NotoJP'; src: url('fonts/NotoSansJP-700.ttf'); font-weight: 700; }
+:root { --paper: #F8F6EF; --ink: #1A1A1A; --red: #D74343; --lime: #DDE768; --sub: #78756E; --line: #E6E2D8; --card: #EFEBE1; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #D9D5CC; font-family: 'Jost', 'NotoJP', sans-serif; color: var(--ink); padding: 40px 32px; }
+h1.page { font-family: 'Jost'; font-weight: 700; letter-spacing: .06em; font-size: 26px; margin-bottom: 6px; }
+p.lead { font-family: 'NotoJP'; font-size: 13px; color: #55524c; margin-bottom: 28px; line-height: 1.6; }
+.row { display: flex; gap: 28px; flex-wrap: wrap; }
+.wrap { display: flex; flex-direction: column; gap: 10px; }
+.cap { font-family: 'NotoJP'; font-size: 12px; color: #4a4741; width: 300px; line-height: 1.6; }
+.cap b { font-family: 'NotoJP'; font-weight: 700; display: block; color: var(--ink); margin-bottom: 2px; }
+.phone { width: 300px; height: 650px; background: #111; border-radius: 34px; overflow: hidden; position: relative;
+  box-shadow: 0 18px 40px rgba(0,0,0,.18), 0 0 0 8px #111; }
+/* 背景: さっき作った1枚（仮置き） */
+.bg { position: absolute; inset: 0; background: linear-gradient(160deg,#2b2320,#0e0b0a); }
+.bg::before { content:''; position:absolute; inset:0; background: radial-gradient(circle at 50% 30%, rgba(255,250,240,.5), transparent 55%); }
+.person::after { content: ''; position: absolute; left: 50%; top: 14%; width: 60%; height: 90%; transform: translateX(-50%);
+  background: radial-gradient(ellipse 30% 17% at 50% 16%, rgba(236,196,170,.95) 98%, transparent 100%),
+              radial-gradient(ellipse 50% 60% at 50% 72%, rgba(30,26,24,.8) 98%, transparent 100%); }
+.close { position: absolute; right: 12px; top: 10px; z-index: 6; width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,.35); color: #fff; font-size: 12px; display: grid; place-items: center; }
+/* 下から出るシート */
+.sheet .close { background: var(--card); color: var(--ink); }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; background: var(--paper); border-radius: 22px 22px 0 0; padding: 12px 16px 12px; }
+.grab { width: 36px; height: 4px; border-radius: 2px; background: #d6d1c5; margin: 0 auto 10px; }
+/* ビフォーアフター */
+.ba { display: flex; gap: 6px; height: 128px; margin-bottom: 8px; }
+.ba .after { flex: 1.4; border-radius: 6px; position: relative; overflow: hidden; }
+.ba .before { flex: 1; border-radius: 6px; position: relative; overflow: hidden; background: linear-gradient(170deg,#8f8a82,#4c4844); }
+.ba .before::after { filter: saturate(.4); }
+.tag { position: absolute; left: 6px; top: 6px; z-index: 3; font-family: 'Jost'; font-weight: 700; font-size: 8px; letter-spacing: .14em; background: rgba(248,246,239,.92); padding: 2px 6px; }
+.tag.y { background: var(--lime); }
+.strip { display: flex; gap: 5px; margin-bottom: 10px; }
+.strip div { flex: 1; height: 44px; border-radius: 4px; position: relative; overflow: hidden; }
+.strip div::after { top: 10%; width: 70%; }
+.s1 { background: linear-gradient(170deg,#f6d9a8,#e48a5a 60%,#7b3f2e); }
+.s2 { background: linear-gradient(180deg,#cfe0ea,#f5efe2); }
+.s3 { background: linear-gradient(160deg,#4b2b36,#1b1115); }
+.s4 { background: linear-gradient(170deg,#e9e3d6,#b9b1a1); }
+.s5 { background: linear-gradient(160deg,#20303d,#0b1218); }
+.s0 { background: linear-gradient(160deg,#2b2320,#0e0b0a); }
+.eyebrow { font-family: 'Jost'; font-weight: 700; font-size: 8.5px; letter-spacing: .24em; color: var(--red); }
+.title { font-family: 'NotoJP'; font-weight: 700; font-size: 17px; line-height: 1.35; margin: 3px 0 8px; }
+.title.en { font-family: 'Jost'; font-size: 21px; font-weight: 700; letter-spacing: .02em; line-height: 1.15; }
+.perks { display: flex; gap: 6px; margin-bottom: 10px; }
+.perks span { flex: 1; text-align: center; font-family: 'NotoJP'; font-size: 9.5px; line-height: 1.35; padding: 6px 2px; border-radius: 6px; background: var(--card); }
+.perks span b { display: block; font-size: 12px; margin-bottom: 1px; }
+.plan { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 9px 11px; display: flex; justify-content: space-between; align-items: center; position: relative; margin-bottom: 6px; }
+.plan.on { border: 1.6px solid var(--ink); }
+.plan .l { display: flex; gap: 8px; align-items: center; }
+.radio { width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid #bdb7aa; flex: none; }
+.plan.on .radio { border: 4.5px solid var(--ink); }
+.plan b { font-family: 'NotoJP'; font-size: 12.5px; }
+.plan .d { font-family: 'NotoJP'; font-size: 9.5px; color: var(--sub); margin-top: 1px; }
+.plan .pr { text-align: right; font-family: 'Jost'; font-weight: 700; font-size: 14px; white-space: nowrap; }
+.plan .pr small { display: block; font-family: 'NotoJP'; font-weight: 400; font-size: 9px; color: var(--sub); }
+.badge { position: absolute; top: -8px; right: 10px; background: var(--red); color: #fff; font-family: 'NotoJP'; font-weight: 700; font-size: 8.5px; padding: 2px 8px; border-radius: 3px; }
+.tl { display: flex; align-items: flex-start; gap: 0; margin: 6px 0 8px; position: relative; }
+.tl::before { content: ''; position: absolute; left: 8%; right: 8%; top: 5px; height: 2px; background: linear-gradient(90deg, var(--ink) 0 34%, #cfc9bc 34%); }
+.tl div { flex: 1; text-align: center; font-family: 'NotoJP'; font-size: 8.5px; color: var(--sub); line-height: 1.35; position: relative; }
+.tl div i { display: block; width: 12px; height: 12px; border-radius: 50%; background: var(--paper); border: 2px solid #cfc9bc; margin: 0 auto 3px; }
+.tl div.now i { background: var(--ink); border-color: var(--ink); }
+.tl div b { display: block; color: var(--ink); font-size: 9.5px; }
+.note { font-family: 'NotoJP'; font-size: 9.5px; color: var(--sub); text-align: center; margin: 4px 0 8px; }
+.note b { color: var(--ink); }
+.cta { background: var(--ink); color: var(--paper); text-align: center; padding: 13px 0; font-family: 'NotoJP'; font-weight: 700; font-size: 13.5px; border-radius: 999px; }
+.cta small { display: block; font-weight: 400; font-size: 9.5px; opacity: .75; margin-top: 1px; }
+.links { display: flex; justify-content: space-between; font-family: 'NotoJP'; font-size: 8.5px; color: var(--sub); margin-top: 8px; }
+.links u { color: var(--ink); }
+.legal { font-family: 'NotoJP'; font-size: 7.5px; color: #9a968e; line-height: 1.45; margin-top: 6px; }
+/* クレジット追加・解約時のシート */
+.dim { position: absolute; inset: 0; z-index: 4; background: rgba(0,0,0,.45); }
+.paperbg { position: absolute; inset: 0; background: var(--paper); }
+.mini-top { position: absolute; left: 0; right: 0; top: 30px; display: block; padding: 6px 18px; font-family: 'Jost'; font-weight: 700; font-size: 15px; letter-spacing: .16em; z-index: 2; }
+.mini-top small { font-size: 8px; color: var(--red); letter-spacing: .16em; margin-left: 5px; vertical-align: 2px; }
+.grid { position: absolute; left: 18px; right: 18px; top: 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.grid div { height: 150px; border-radius: 4px; position: relative; overflow: hidden; }
+.meter { display: flex; align-items: center; justify-content: space-between; background: var(--card); border-radius: 8px; padding: 9px 12px; margin-bottom: 10px; font-family: 'NotoJP'; font-size: 11px; }
+.meter b { font-family: 'Jost'; font-size: 16px; }
+.pack { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 11px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; position: relative; }
+.pack.on { border: 1.6px solid var(--ink); }
+.pack b { font-family: 'NotoJP'; font-size: 13px; }
+.pack .d { font-family: 'NotoJP'; font-size: 9.5px; color: var(--sub); }
+.pack .pr { font-family: 'Jost'; font-weight: 700; font-size: 15px; }
+.h2 { font-family: 'NotoJP'; font-weight: 700; font-size: 16px; margin: 2px 0 4px; }
+.p { font-family: 'NotoJP'; font-size: 11px; color: #4a4741; line-height: 1.6; margin-bottom: 12px; }
+.ghost { text-align: center; font-family: 'NotoJP'; font-size: 11px; color: var(--sub); padding: 10px 0 2px; text-decoration: underline; }
+</style>
+</head>
+<body>
+<h1 class="page">MARUMIE AI PHOTO — 課金画面 画面案</h1>
+<p class="lead">2026-11-09。仕様まとめ 6.3 に合わせて作り直したもの。初回の1枚ができた直後に、その写真を背景にして下からシートを出す。<br>プランは週額 PRO（3日無料）と年額 PRO の2つだけ。起動のたびには出さない。写真は仮置き。</p>
+<div class="row">
+
+  <!-- 1. 日本・週額選択（メイン） -->
+  <div class="wrap">
+    <div class="phone">
+      <div class="bg person"></div>
+      <div class="sheet">
+        <div class="close">✕</div>
+        <div class="grab"></div>
+        <div class="ba">
+          <div class="before person"><span class="tag">BEFORE</span></div>
+          <div class="after s0 person"><span class="tag y">AFTER</span></div>
+        </div>
+        <div class="strip"><div class="s1 person"></div><div class="s2 person"></div><div class="s3 person"></div><div class="s4 person"></div><div class="s5 person"></div></div>
+        <div class="eyebrow">MARUMIE AI PHOTO PRO</div>
+        <div class="title">全スタイルで、<br>もっと自分を変身させよう</div>
+        <div class="perks"><span><b>全スタイル</b>エフェクトも<br>テンプレートも</span><span><b>毎週の新作</b>トレンドを<br>すぐお届け</span><span><b>ロゴなし</b>そのまま<br>保存・共有</span></div>
+        <div class="plan on"><div class="l"><span class="radio"></span><div><b>週額</b><div class="d">3日間無料・毎週25クレジット</div></div></div><div class="pr">¥900<small>/週</small></div></div>
+        <div class="plan"><span class="badge">最もお得</span><div class="l"><span class="radio"></span><div><b>年額</b><div class="d">¥112/週相当・毎月30クレジット</div></div></div><div class="pr">¥5,800<small>/年</small></div></div>
+        <div class="tl"><div class="now"><i></i><b>今日</b>¥0</div><div><i></i><b>2日目</b>通知でお知らせ</div><div><i></i><b>3日目</b>¥900/週 開始</div><div><i></i><b>いつでも</b>解約できます</div></div>
+        <div class="cta">無料で始める<small>3日間無料、その後 ¥900/週</small></div>
+        <div class="links"><u>クレジットだけ買う</u><span>購入を復元</span><span>規約・プライバシー</span></div>
+      </div>
+    </div>
+    <div class="cap"><b>1. 日本・週額を選んだ状態（メイン）</b>初回の1枚の直後に出す。背景と上段はさっき作った自分の写真、その下に他のスタイルの見本。特典は3つだけ。週額が初期選択で、トライアルの流れ（今日¥0 → 2日目に通知 → 3日目から課金）を見せて安心させる。右上の✕で閉じれば、ロゴ入りで無料保存できる。</div>
+  </div>
+
+  <!-- 2. 日本・年額選択 -->
+  <div class="wrap">
+    <div class="phone">
+      <div class="bg person"></div>
+      <div class="sheet">
+        <div class="close">✕</div>
+        <div class="grab"></div>
+        <div class="ba">
+          <div class="before person"><span class="tag">BEFORE</span></div>
+          <div class="after s0 person"><span class="tag y">AFTER</span></div>
+        </div>
+        <div class="strip"><div class="s1 person"></div><div class="s2 person"></div><div class="s3 person"></div><div class="s4 person"></div><div class="s5 person"></div></div>
+        <div class="eyebrow">MARUMIE AI PHOTO PRO</div>
+        <div class="title">全スタイルで、<br>もっと自分を変身させよう</div>
+        <div class="perks"><span><b>全スタイル</b>エフェクトも<br>テンプレートも</span><span><b>毎週の新作</b>年額は<br>先行利用つき</span><span><b>ロゴなし</b>そのまま<br>保存・共有</span></div>
+        <div class="plan"><div class="l"><span class="radio"></span><div><b>週額</b><div class="d">3日間無料・毎週25クレジット</div></div></div><div class="pr">¥900<small>/週</small></div></div>
+        <div class="plan on"><span class="badge">最もお得</span><div class="l"><span class="radio"></span><div><b>年額</b><div class="d">¥112/週相当・毎月30クレジット</div></div></div><div class="pr">¥5,800<small>/年</small></div></div>
+        <div class="note">週額を1年続けるより <b>約88%おトク</b>。今日 ¥5,800 のお支払い</div>
+        <div class="cta">続ける<small>¥5,800/年・いつでも解約できます</small></div>
+        <div class="links"><u>クレジットだけ買う</u><span>購入を復元</span><span>規約・プライバシー</span></div>
+        <div class="legal">自動更新されます。更新日の24時間前までに解約しない限り、同じ料金で更新されます。解約はストアの設定から。</div>
+      </div>
+    </div>
+    <div class="cap"><b>2. 日本・年額を選んだ状態</b>年額はトライアルなし。タイムラインの代わりに「週額を1年続けるより約88%おトク」と今日の支払額を出す。ボタンは「続ける」。自動更新の説明（ストアの審査で必要）を小さく。日本では A/B テストで年額を初期選択にする案も試す。</div>
+  </div>
+
+  <!-- 3. 海外（英語）・週額 -->
+  <div class="wrap">
+    <div class="phone">
+      <div class="bg person"></div>
+      <div class="sheet">
+        <div class="close">✕</div>
+        <div class="grab"></div>
+        <div class="ba">
+          <div class="before person"><span class="tag">BEFORE</span></div>
+          <div class="after s5 person"><span class="tag y">AFTER</span></div>
+        </div>
+        <div class="strip"><div class="s0 person"></div><div class="s3 person"></div><div class="s1 person"></div><div class="s2 person"></div><div class="s4 person"></div></div>
+        <div class="eyebrow">MARUMIE AI PHOTO PRO</div>
+        <div class="title en">Unlock every look</div>
+        <div class="perks"><span><b>Every look</b>effects and<br>templates</span><span><b>New weekly</b>trends,<br>fast</span><span><b>No logo</b>save and<br>share clean</span></div>
+        <div class="plan on"><div class="l"><span class="radio"></span><div><b style="font-family:Jost">Weekly</b><div class="d" style="font-family:Jost">3-day free trial · 25 credits/week</div></div></div><div class="pr">$5.99<small style="font-family:Jost">/week</small></div></div>
+        <div class="plan"><span class="badge" style="font-family:Jost">BEST VALUE</span><div class="l"><span class="radio"></span><div><b style="font-family:Jost">Yearly</b><div class="d" style="font-family:Jost">$0.77/week · 30 credits/month</div></div></div><div class="pr">$39.99<small style="font-family:Jost">/year</small></div></div>
+        <div class="note" style="font-family:Jost;font-size:12px"><b>No payment due today</b></div>
+        <div class="tl" style="margin-top:2px"><div class="now"><i></i><b style="font-family:Jost">Today</b><span style="font-family:Jost">$0</span></div><div><i></i><b style="font-family:Jost">Day 2</b><span style="font-family:Jost">Reminder</span></div><div><i></i><b style="font-family:Jost">Day 3</b><span style="font-family:Jost">$5.99/wk</span></div><div><i></i><b style="font-family:Jost">Anytime</b><span style="font-family:Jost">Cancel</span></div></div>
+        <div class="cta" style="font-family:Jost">Start free trial<small style="font-family:Jost">3 days free, then $5.99/week</small></div>
+        <div class="links" style="font-family:Jost"><u>Buy credits only</u><span>Restore</span><span>Terms · Privacy</span></div>
+      </div>
+    </div>
+    <div class="cap"><b>3. 海外（英語）・週額</b>見出しは「Unlock every look」。「No payment due today」を大きく。見本のスタイルは海外向け（デジカメフラッシュ・雑誌の表紙風・Y2K）を先頭に。英語の文字は Jost。</div>
+  </div>
+
+  <!-- 4. クレジットを使い切った会員 -->
+  <div class="wrap">
+    <div class="phone">
+      <div class="paperbg"></div>
+      <div class="mini-top">MARUMIE<small>AI PHOTO</small></div>
+      <div class="grid"><div class="s1 person"></div><div class="s0 person"></div><div class="s2 person"></div><div class="s3 person"></div></div>
+      <div class="dim"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="h2">今週のクレジットを使い切りました</div>
+        <div class="p">次の25クレジットは <b>11月16日（月）</b> に届きます。今すぐ作りたいときは、クレジットを追加できます。</div>
+        <div class="meter"><span>のこりのクレジット</span><b>0 / 25</b></div>
+        <div class="pack on"><div><b>10クレジット</b><div class="d">期限なし・1枚=1クレジット</div></div><div class="pr">¥600</div></div>
+        <div class="pack"><span class="badge">おトク</span><div><b>30クレジット</b><div class="d">期限なし・1枚あたり¥50</div></div><div class="pr">¥1,500</div></div>
+        <div class="cta" style="margin-top:6px">10クレジットを追加</div>
+        <div class="ghost">新作が届くまで待つ</div>
+      </div>
+    </div>
+    <div class="cap"><b>4. クレジットを使い切った会員</b>会員にはサブスクの勧誘をせず、クレジットの追加だけを案内する。次に届く日をはっきり書き、「待つ」も選べるようにする。高画質は2クレジット消費なので、メーターで残りが分かるようにする。</div>
+  </div>
+
+  <!-- 5. 解約しようとした人 -->
+  <div class="wrap">
+    <div class="phone">
+      <div class="paperbg"></div>
+      <div class="mini-top">MARUMIE<small>AI PHOTO</small></div>
+      <div class="grid"><div class="s2 person"></div><div class="s4 person"></div><div class="s5 person"></div><div class="s1 person"></div></div>
+      <div class="dim"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <div class="h2">解約する前に</div>
+        <div class="p">毎週はいらない、という方へ。<br>サブスクなしで、必要なときだけ使えるクレジットがあります。</div>
+        <div class="pack on"><div><b>10クレジット</b><div class="d">期限なし・作った写真はそのまま</div></div><div class="pr">¥600</div></div>
+        <div class="cta" style="margin-top:6px">クレジットにして続ける</div>
+        <div class="ghost">このまま解約手続きへ（ストアの設定を開く）</div>
+        <div class="legal" style="text-align:center;margin-top:10px">解約してもギャラリーの写真と無料の編集はそのまま使えます。</div>
+      </div>
+    </div>
+    <div class="cap"><b>5. 解約しようとした人</b>アプリ内の「サブスクの管理」から解約に進んだ人に出す（ストアの設定から直接解約する人には出せない）。完全に失うより、クレジットで残ってもらう。解約の手続きへ進む道は必ず同じ画面に残す（隠すと審査・法律の問題になる）。</div>
+  </div>
+
+</div>
+</body>
+</html>

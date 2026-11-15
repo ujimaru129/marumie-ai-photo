@@ -1,0 +1,6 @@
+# 検証用の写真と生成した画像はリポジトリに入れない（個人の写真のため）
+eval/photos_raw/
+eval/inputs/
+eval/out/
+__pycache__/
+.DS_Store

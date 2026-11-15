@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MARUMIE AI PHOTO 画面案</title>
+<!-- MARUMIE AI PHOTO（MARUMIE CAMERA とは別のアプリ）の画面イメージ（2026-11-03、たたき台）。
+     色はアプリのブランドカラー（src/theme.ts: Paper #F8F6EF / Ink #1A1A1A / Red #D74343 / Lime #DDE768）、
+     書体はアプリに入っている Bodoni Moda・Jost・Noto Sans JP（assets/fonts）。
+     写真部分はグラデーションの仮置き。実際はスタイルごとの見本写真を入れる。 -->
+<style>
+@font-face { font-family: 'Bodoni'; src: url('fonts/BodoniModa-700.ttf'); font-weight: 700; }
+@font-face { font-family: 'Jost'; src: url('fonts/Jost-400.ttf'); font-weight: 400; }
+@font-face { font-family: 'Jost'; src: url('fonts/Jost-700.ttf'); font-weight: 700; }
+@font-face { font-family: 'NotoJP'; src: url('fonts/NotoSansJP-400.ttf'); font-weight: 400; }
+@font-face { font-family: 'NotoJP'; src: url('fonts/NotoSansJP-700.ttf'); font-weight: 700; }
+:root {
+  --paper: #F8F6EF; --ink: #1A1A1A; --red: #D74343; --lime: #DDE768;
+  --sub: #78756E; --line: #E6E2D8; --card: #EFEBE1;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #D9D5CC; font-family: 'Jost', 'NotoJP', sans-serif; color: var(--ink); padding: 40px 32px; }
+h1.page { font-family: 'Jost'; font-weight: 700; letter-spacing: .06em; font-size: 26px; margin-bottom: 6px; }
+p.lead { font-family: 'NotoJP'; font-size: 13px; color: #55524c; margin-bottom: 28px; }
+.row { display: flex; gap: 28px; flex-wrap: wrap; }
+.wrap { display: flex; flex-direction: column; gap: 10px; }
+.cap { font-family: 'NotoJP'; font-size: 12px; color: #4a4741; width: 300px; line-height: 1.6; }
+.cap b { font-family: 'Jost'; font-weight: 700; letter-spacing: .08em; display: block; color: var(--ink); }
+.phone { width: 300px; height: 650px; background: var(--paper); border-radius: 34px; overflow: hidden; position: relative;
+  box-shadow: 0 18px 40px rgba(0,0,0,.18), 0 0 0 8px #111; display: flex; flex-direction: column; }
+.status { height: 26px; }
+.top { display: flex; align-items: center; justify-content: space-between; padding: 6px 18px 10px; }
+.logo { font-family: 'Jost'; font-weight: 700; font-size: 16px; letter-spacing: .18em; }
+.logo small { font-family: 'Jost'; font-weight: 700; font-size: 8px; letter-spacing: .16em; margin-left: 6px; color: var(--red); vertical-align: 3px; }
+.iconbtn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; font-size: 13px; }
+.seg { display: flex; margin: 0 18px 10px; border-bottom: 1px solid var(--line); }
+.seg div { flex: 1; text-align: center; font-family: 'NotoJP'; font-size: 12px; padding: 8px 0; color: var(--sub); }
+.seg .on { color: var(--ink); font-weight: 700; box-shadow: inset 0 -2px 0 var(--ink); }
+.quota { margin: 0 18px 10px; display: flex; align-items: center; justify-content: space-between; font-family: 'NotoJP'; font-size: 11px; }
+.dots { display: flex; gap: 4px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); display: block; }
+.dots i.off { background: transparent; border: 1px solid var(--ink); }
+.grid { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 168px; align-content: start; gap: 8px; padding: 0 18px; overflow: hidden; flex: 1; }
+.card { border-radius: 4px; height: 168px; position: relative; overflow: hidden; }
+.card .name { z-index: 3; text-shadow: 0 1px 6px rgba(0,0,0,.5); position: absolute; left: 8px; bottom: 8px; color: #fff; font-family: 'Jost'; font-weight: 700; font-size: 10px; letter-spacing: .14em; }
+.card .jp { display: block; font-family: 'NotoJP'; font-weight: 400; font-size: 9px; letter-spacing: .02em; opacity: .85; margin-top: 2px; }
+.badge { z-index: 3; position: absolute; top: 7px; left: 7px; font-family: 'Jost'; font-weight: 700; font-size: 8px; letter-spacing: .14em; padding: 3px 6px; background: var(--lime); color: var(--ink); }
+.badge.pro { background: var(--ink); color: var(--paper); left: auto; right: 7px; }
+.person::after { content: ''; position: absolute; left: 50%; top: 28%; width: 46%; height: 90%; transform: translateX(-50%);
+  background: radial-gradient(ellipse 30% 17% at 50% 16%, rgba(236,196,170,.95) 98%, transparent 100%),
+              radial-gradient(ellipse 50% 60% at 50% 72%, rgba(30,26,24,.75) 98%, transparent 100%); }
+.p1 { background: linear-gradient(160deg,#2b2320,#0e0b0a); }
+.p1.flash::before { content:''; position:absolute; inset:0; background: radial-gradient(circle at 50% 35%, rgba(255,250,240,.55), transparent 55%); z-index: 1; }
+.p2 { background: linear-gradient(170deg,#f6d9a8,#e48a5a 60%,#7b3f2e); }
+.p3 { background: linear-gradient(180deg,#cfe0ea,#f5efe2); }
+.p4 { background: linear-gradient(160deg,#4b2b36,#1b1115); }
+.p5 { background: linear-gradient(170deg,#e9e3d6,#b9b1a1); }
+.p6 { background: linear-gradient(160deg,#20303d,#0b1218); }
+.person::after { z-index: 2; }
+.tabbar { height: 62px; border-top: 1px solid var(--line); display: flex; justify-content: space-around; align-items: center; font-family: 'NotoJP'; font-size: 10px; color: var(--sub); background: var(--paper); }
+.tabbar div { text-align: center; }
+.tabbar span { display: block; font-size: 16px; margin-bottom: 2px; }
+.tabbar .on { color: var(--ink); font-weight: 700; }
+.tabbar .shutter { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; }
+.tabbar .shutter i { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); display: block; }
+.body { padding: 0 18px; flex: 1; display: flex; flex-direction: column; }
+.hero { height: 190px; border-radius: 4px; position: relative; overflow: hidden; }
+.hero .t { text-shadow: 0 1px 8px rgba(0,0,0,.5); position: absolute; left: 14px; bottom: 14px; color: #fff; z-index: 3; }
+.hero .t b { font-family: 'Bodoni'; font-size: 22px; display: block; }
+.hero .t span { font-family: 'NotoJP'; font-size: 11px; opacity: .9; }
+.label { font-family: 'Jost'; font-weight: 700; font-size: 10px; letter-spacing: .2em; margin: 16px 0 8px; }
+.drop { flex: 0 0 200px; border: 1.5px dashed #bdb7aa; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; font-family: 'NotoJP'; font-size: 12px; color: var(--sub); }
+.pillrow { display: flex; gap: 8px; }
+.pill { border: 1px solid var(--ink); border-radius: 999px; padding: 7px 14px; font-family: 'NotoJP'; font-size: 11px; color: var(--ink); }
+.cta { margin-top: auto; margin-bottom: 18px; background: var(--ink); color: var(--paper); text-align: center; padding: 15px 0; font-family: 'NotoJP'; font-weight: 700; font-size: 13px; border-radius: 999px; }
+.cta small { display: block; font-weight: 400; font-size: 10px; opacity: .7; margin-top: 2px; }
+.note { font-family: 'NotoJP'; font-size: 9.5px; color: var(--sub); text-align: center; margin: -8px 0 14px; line-height: 1.5; }
+.gen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 0 30px; }
+.develop { width: 190px; height: 250px; background: #fff; padding: 10px 10px 40px; box-shadow: 0 10px 24px rgba(0,0,0,.12); transform: rotate(-3deg); }
+.develop div { width: 100%; height: 100%; position: relative; overflow: hidden; background: linear-gradient(160deg,#2b2320,#0e0b0a); }
+.develop div::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(248,246,239,0) 0%, rgba(248,246,239,.85) 55%, var(--paper) 100%); z-index: 3; }
+.gen h3 { font-family: 'Bodoni'; font-size: 20px; }
+.gen p { font-family: 'NotoJP'; font-size: 11px; color: var(--sub); text-align: center; line-height: 1.6; }
+.bar { width: 100%; height: 2px; background: var(--line); position: relative; }
+.bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 62%; background: var(--ink); }
+.result { margin: 0 18px; height: 380px; border-radius: 4px; position: relative; overflow: hidden; }
+.ai-tag { position: absolute; right: 8px; bottom: 8px; z-index: 4; font-family: 'Jost'; font-weight: 700; font-size: 8px; letter-spacing: .16em; background: rgba(26,26,26,.6); color: #fff; padding: 3px 6px; }
+.hold { position: absolute; right: 8px; top: 8px; z-index: 4; font-family: 'Jost'; font-weight: 700; font-size: 9px; letter-spacing: .12em; background: var(--paper); padding: 5px 9px; border-radius: 999px; }
+.actions { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; padding: 14px 18px 6px; text-align: center; font-family: 'NotoJP'; font-size: 10px; }
+.actions span { display: grid; place-items: center; width: 40px; height: 40px; margin: 0 auto 4px; border-radius: 50%; border: 1px solid var(--line); font-size: 15px; }
+.actions .main span { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.report { text-align: center; font-family: 'NotoJP'; font-size: 10px; color: var(--sub); text-decoration: underline; padding: 6px 0 14px; }
+.pw-top { height: 210px; position: relative; overflow: hidden; background: var(--ink); }
+.pw-top .strip { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; opacity: .55; }
+.pw-top .strip div { position: relative; overflow: hidden; }
+.pw-top .t { position: absolute; left: 18px; bottom: 16px; color: var(--paper); z-index: 5; }
+.pw-top .t small { font-family: 'Jost'; font-weight: 700; font-size: 9px; letter-spacing: .24em; color: var(--lime); }
+.pw-top .t b { display: block; font-family: 'Bodoni'; font-size: 24px; line-height: 1.15; margin-top: 4px; }
+.pw-x { position: absolute; right: 14px; top: 34px; color: var(--paper); z-index: 5; font-size: 14px; }
+.plans { padding: 14px 18px 0; display: flex; flex-direction: column; gap: 8px; }
+.plan { border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 11px 12px; display: flex; justify-content: space-between; align-items: center; position: relative; }
+.plan.on { border: 1.5px solid var(--ink); }
+.plan b { font-family: 'Jost'; font-size: 15px; }
+.plan .d { font-family: 'NotoJP'; font-size: 10px; color: var(--sub); margin-top: 2px; }
+.plan .pr { text-align: right; font-family: 'Jost'; font-weight: 700; font-size: 15px; }
+.plan .pr small { display: block; font-family: 'NotoJP'; font-weight: 400; font-size: 9px; color: var(--sub); }
+.rec { position: absolute; top: -8px; right: 12px; background: var(--red); color: #fff; font-family: 'NotoJP'; font-weight: 700; font-size: 9px; padding: 2px 8px; }
+.toggle { display: flex; margin: 12px 18px 0; background: var(--card); border-radius: 999px; padding: 3px; font-family: 'NotoJP'; font-size: 11px; }
+.toggle div { flex: 1; text-align: center; padding: 6px 0; border-radius: 999px; color: var(--sub); }
+.toggle .on { background: var(--paper); color: var(--ink); font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.free { margin: 10px 18px 0; text-align: center; font-family: 'NotoJP'; font-size: 11px; padding: 10px; border-top: 1px solid var(--line); }
+.free u { color: var(--ink); font-weight: 700; }
+.legal { display: flex; justify-content: space-between; padding: 0 18px 14px; font-family: 'NotoJP'; font-size: 9px; color: var(--sub); }
+</style>
+</head>
+<body>
+<h1 class="page">MARUMIE AI PHOTO — 画面案</h1>
+<p class="lead">2026-11-03 たたき台。ブランドカラー（Paper / Ink / Red / Lime）とアプリ同梱の書体（Bodoni Moda・Jost・Noto Sans JP）で組んだもの。写真は仮置き。<b>課金画面は paywall.html（2026-11-09 改訂）を参照。</b></p>
+<div class="row">
+
+  <!-- 1. スタイル一覧 -->
+  <div class="wrap">
+    <div class="phone">
+      <div class="status"></div>
+      <div class="top"><div class="logo">MARUMIE<small>AI PHOTO</small></div><div class="iconbtn">⚙</div></div>
+      <div class="seg"><div class="on">エフェクト</div><div>テンプレート</div></div>
+      <div class="quota"><span>はじめの1枚は無料（全スタイル）</span><span class="dots"><i></i></span></div>
+      <div class="grid">
+        <div class="card p1 person flash"><span class="badge">NEW</span><div class="name">DIGICAM FLASH<span class="jp">デジカメフラッシュ</span></div></div>
+        <div class="card p2 person"><div class="name">GOLDEN BACKLIGHT<span class="jp">夕焼けの逆光</span></div></div>
+        <div class="card p3 person"><div class="name">DAY FLASH<span class="jp">昼のフラッシュ</span></div></div>
+        <div class="card p4 person"><span class="badge pro">PRO</span><div class="name">STUDIO LIGHT<span class="jp">スタジオ照明</span></div></div>
+        <div class="card p5 person"><div class="name">HD REMASTER<span class="jp">高画質リマスター</span></div></div>
+        <div class="card p6 person"><span class="badge pro">PRO</span><div class="name">NIGHT NEON<span class="jp">夜のネオン</span></div></div>
+      </div>
+      <div class="tabbar">
+        <div class="on"><span>✦</span>AI</div>
+        <div><span>◐</span>編集</div>
+        <div><span>▦</span>ギャラリー</div>
+      </div>
+    </div>
+    <div class="cap"><b>1. スタイル一覧</b>下のタブは AI / 編集（無料・フィルター50種）/ ギャラリー。上で「エフェクト / テンプレート」を切り替え。初回は全スタイルから1枚無料。会員には残りクレジットを見せる。有料のスタイルには PRO、新作には NEW（ライム）。</div>
+  </div>
+
+  <!-- 2. 写真を選ぶ -->
+  <div class="wrap">
+    <div class="phone">
+      <div class="status"></div>
+      <div class="top"><div class="iconbtn">←</div><div class="logo">MARUMIE<small>AI PHOTO</small></div><div style="width:30px"></div></div>
+      <div class="body">
+        <div class="hero p1 person flash"><div class="t"><b>Digicam Flash</b><span>2000年代のデジカメ風の直射フラッシュ</span></div></div>
+        <div class="label">YOUR PHOTO</div>
+        <div class="drop">
+          <span>顔がはっきり写った写真を1枚</span>
+          <div class="pillrow"><div class="pill">写真を選ぶ</div><div class="pill">撮影する</div></div>
+        </div>
+        <div class="cta" style="margin-top:16px;opacity:.35">無料で1枚つくる<small>はじめの1枚は全スタイルから無料</small></div>
+        <p class="note">写真はAIで加工するため外部のサービスに送られ、24時間後に削除されます。</p>
+      </div>
+    </div>
+    <div class="cap"><b>2. 写真を選ぶ</b>見本＋1行の説明。写真を入れるとボタンが有効になる。初回は「無料で1枚つくる」、会員は「作成する（1クレジット）」。外部送信の説明と「本人の写真です」の確認は最初から見える場所に。</div>
+  </div>
+
+  <!-- 3. 生成中 -->
+  <div class="wrap">
+    <div class="phone">
+      <div class="status"></div>
+      <div class="top"><div class="iconbtn">×</div><div class="logo">MARUMIE<small>AI PHOTO</small></div><div style="width:30px"></div></div>
+      <div class="gen">
+        <div class="develop"><div class="person"></div></div>
+        <h3>現像しています…</h3>
+        <div class="bar"><i></i></div>
+        <p>10〜20秒ほどかかります。<br>途中でやめても回数は減りません。</p>
+      </div>
+    </div>
+    <div class="cap"><b>3. 生成中</b>チェキが浮かび上がるように少しずつ見えてくる演出。待ち時間を「現像」に見立てる。キャンセルしても回数は消費しない。</div>
+  </div>
+
+  <!-- 4. 結果 -->
+  <div class="wrap">
+    <div class="phone">
+      <div class="status"></div>
+      <div class="top"><div class="iconbtn">←</div><div class="logo">MARUMIE<small>AI PHOTO</small></div><div style="width:30px"></div></div>
+      <div class="result p1 person flash"><span class="hold">HOLD 元の写真</span><span class="ai-tag">AI · MARUMIE</span></div>
+      <div class="actions">
+        <div class="main"><span>↓</span>保存</div>
+        <div><span>↗</span>共有</div>
+        <div><span>◐</span>仕上げる</div>
+        <div><span>↻</span>もう一度</div>
+      </div>
+      <div class="report">問題のある画像を報告する</div>
+    </div>
+    <div class="cap"><b>4. 結果</b>押している間だけ元の写真。「仕上げる」でアプリ内の無料編集へ。さらに美顔・フレームは MARUMIE CAMERA へ渡せる。報告ボタンは Google Play の必須項目。</div>
+  </div>
+
+</div>
+</body>
+</html>
