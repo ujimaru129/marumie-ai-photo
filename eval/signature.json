@@ -1,5 +1,5 @@
 {
-  "_説明": "スタイルごとのシグネチャー仕上げ（AI の出力にかける MARUMIE の LUT と強さ）。アプリでは端末内でかける。LUT は assets/luts（隊長作成、2026-11-16）。null は LUT なし",
+  "_説明": "スタイルごとのシグネチャー仕上げ。アプリでは端末内でかける。LUT は assets/luts（隊長作成、2026-11-16）。値は \"day\" / \"night\" / null（LUT なし）、または {\"lut\": \"day\"|\"night\"|null, \"strength\": 強さ, \"grain\": 細かいノイズの量 0〜1} で個別に指定",
   "day": {
     "lut": "MARUMIE_DayTeal_Smoky",
     "strength": 0.7
@@ -14,16 +14,22 @@
     "golden_hour": "night",
     "day_flash": "day",
     "korean_studio": null,
-    "cafe_window": "night",
+    "cafe_window": "day",
     "photobooth": "day",
     "magazine_cover": "day",
     "tokyo_crossing": "day",
-    "strobe_black": null,
-    "konbini_night": "night",
+    "strobe_black": {
+      "lut": null,
+      "grain": 0.25
+    },
     "beach_day": "day",
-    "rooftop_night": "night",
+    "rooftop_night": {
+      "lut": "night",
+      "strength": 0.8
+    },
     "sakura": "day",
     "y2k_bedroom": "day",
-    "purikura": null
+    "purikura": null,
+    "vending_night": "night"
   }
 }

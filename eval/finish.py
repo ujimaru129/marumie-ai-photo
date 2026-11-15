@@ -53,6 +53,37 @@ def apply_lut(img, lut, strength=1.0):
     return Image.fromarray((np.clip(out, 0, 1) * 255 + 0.5).astype(np.uint8))
 
 
+def add_grain(img, amount):
+    """細かい白黒のノイズ（グレイン）を足す。amount 0〜1。粒の大きさは画像の長辺に合わせる（1000px あたり1px 程度）。
+    暗い所ほど目立ち、明るい所では控えめにする（フィルムやセンサーのノイズと同じ傾向）。"""
+    if amount <= 0:
+        return img
+    x = np.asarray(img.convert("RGB"), dtype=np.float32) / 255
+    h, w = x.shape[:2]
+    cell = max(1, round(max(h, w) / 1400))
+    rng = np.random.default_rng(0)
+    n = rng.normal(0, 1, ((h + cell - 1) // cell, (w + cell - 1) // cell)).astype(np.float32)
+    n = np.repeat(np.repeat(n, cell, 0), cell, 1)[:h, :w, None]
+    lum = x @ np.array([0.2126, 0.7152, 0.0722], dtype=np.float32)
+    x = x + n * 0.045 * amount * (1 - 0.6 * lum[..., None])
+    return Image.fromarray((np.clip(x, 0, 1) * 255 + 0.5).astype(np.uint8))
+
+
+def finish(img, style, signature, lut_dir):
+    """signature.json の設定に従って、LUT とグレインをかける。"""
+    v = signature["styles"].get(style)
+    if v is None:
+        return img
+    if isinstance(v, str):
+        v = {"lut": v}
+    kind = v.get("lut")
+    if kind:
+        base = signature[kind]
+        lut = load_lut(f"{lut_dir}/{base['lut']}_65.cube")
+        img = apply_lut(img, lut, v.get("strength", base["strength"]))
+    return add_grain(img, v.get("grain", 0))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("src")
