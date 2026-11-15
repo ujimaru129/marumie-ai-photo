@@ -1,0 +1,18 @@
+{
+  "_説明": "スタイルごとのシグネチャー仕上げ（AI の出力にかける MARUMIE の LUT と強さ）。アプリでは端末内でかける。LUT は assets/luts（隊長作成、2026-11-16）",
+  "day": {"lut": "MARUMIE_DayTeal_Smoky", "strength": 1.0},
+  "night": {"lut": "MARUMIE_NightTeal_Smoky", "strength": 1.0},
+  "styles": {
+    "digicam_flash": "night",
+    "neon_night": "night",
+    "tokyo_yokocho": "night",
+    "golden_hour": "day",
+    "day_flash": "day",
+    "korean_studio": "day",
+    "cafe_window": "day",
+    "photobooth": "day",
+    "magazine_cover": "day",
+    "tokyo_crossing": "day",
+    "tokyo_train": "day"
+  }
+}

@@ -3,7 +3,9 @@
 アプリでは端末内の Skia シェーダーでかける（MARUMIE CAMERA と同じ仕組み）。ここでは見え方の確認用に、
 同じ LUT 画像（33³ の帯テクスチャ: x = b*33 + r, y = g）を Python でトライリニア補間してかける。
 
-使い方: python3 finish.py <写真> <出力> <LUT の png> [--strength 0.8]
+使い方: python3 finish.py <写真> <出力> <LUT（.cube か png）> [--strength 0.8]
+
+MARUMIE の LUT（隊長作成、2026-11-16）: assets/luts/MARUMIE_DayTeal_Smoky_*.cube（昼）・MARUMIE_NightTeal_Smoky_*.cube（夜）
 """
 import argparse
 
@@ -14,15 +16,29 @@ N = 33
 
 
 def load_lut(path):
+    """LUT を [g, b, r, 3] の配列で返す。.cube（サイズは何でも）と、MARUMIE CAMERA の帯テクスチャ png（33）に対応。"""
+    if path.lower().endswith(".cube"):
+        size, rows = None, []
+        for line in open(path, encoding="utf-8"):
+            t = line.split()
+            if not t or t[0].startswith("#"):
+                continue
+            if t[0] == "LUT_3D_SIZE":
+                size = int(t[1])
+            elif len(t) == 3 and t[0][0] in "0123456789.-":
+                rows.append([float(v) for v in t])
+        # .cube は赤が最も速く変わる順 → reshape で [b, g, r] → [g, b, r] に並べ替える
+        return np.array(rows, dtype=np.float32).reshape(size, size, size, 3).transpose(1, 0, 2, 3)
     t = np.asarray(Image.open(path).convert("RGB"), dtype=np.float32) / 255  # [g, b*33 + r]
     return t.reshape(N, N, N, 3)  # [g, b, r, 3]
 
 
 def apply_lut(img, lut, strength=1.0):
+    n = lut.shape[0]
     x = np.asarray(img.convert("RGB"), dtype=np.float32) / 255
-    p = x * (N - 1)
+    p = x * (n - 1)
     i0 = np.floor(p).astype(np.int32)
-    i1 = np.minimum(i0 + 1, N - 1)
+    i1 = np.minimum(i0 + 1, n - 1)
     f = p - i0
     out = 0
     for dr in (0, 1):
