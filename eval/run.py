@@ -30,6 +30,7 @@ lock = threading.Lock()
 def load_styles(names):
     files = sorted(glob.glob(os.path.join(HERE, "styles", "*.txt")))
     styles = {os.path.splitext(os.path.basename(f))[0]: open(f, encoding="utf-8").read().strip() for f in files}
+    # 先頭の [ ] の中の「size=WxH」はモデルへの設定として取り出す（例: [template size=1024x3072]）
     if names != "all":
         styles = {k: v for k, v in styles.items() if k in names.split(",")}
     return styles
@@ -74,6 +75,10 @@ def main():
     def work(job):
         m, s, p, name, dst = job
         kw = {"reasoning": a.meta_reasoning} if m == "meta" and a.meta_reasoning else {}
+        tag = styles[s].split("]", 1)[0] if styles[s].startswith("[") else ""
+        size = next((t.split("=", 1)[1] for t in tag.strip("[").split() if t.startswith("size=")), None)
+        if size and m == "meta":
+            kw["size"] = size
         img, info = MODELS[m](open(p, "rb").read(), styles[s], **kw)
         if img:
             # モデルによって形式が違う（Gemini は PNG、Muse Image は WebP）ので PNG にそろえる

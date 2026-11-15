@@ -62,7 +62,7 @@ def gemini(image_bytes, prompt, timeout=180):
                                         "promptFeedback": r.get("promptFeedback")}, ensure_ascii=False)}
 
 
-def meta(image_bytes, prompt, timeout=300, reasoning=None):
+def meta(image_bytes, prompt, timeout=300, reasoning=None, size=None):
     """Muse Image で編集する（OpenAI Images API と同じ形の /v1/images/edits）。
     reasoning: "high"（既定。何度か見直して仕上げる）/ "low"（1回で返す。速い）。料金は同じ。
     出力の大きさはモデルで決まっていて（縦長で約1344×1792）、size は縦横比だけを決める。
@@ -76,6 +76,8 @@ def meta(image_bytes, prompt, timeout=300, reasoning=None):
     field("model", META_MODEL)
     field("prompt", prompt)
     field("n", "1")
+    if size:
+        field("size", size)  # 縦横比だけを決める（例 "1024x3072" で1:3の縦長）
     field("tool_enablement", json.dumps({"enable_image_search": False, "enable_web_search": False, "enable_shell": False}))
     if reasoning:
         field("reasoning_strength", reasoning)
