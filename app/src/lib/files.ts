@@ -19,3 +19,29 @@ export async function removeFile(uri: string): Promise<void> {
   const f = new File(uri);
   if (f.exists) f.delete();
 }
+
+// ギャラリー: 作った写真を端末の中だけに残す（サーバーには残らない）
+export type GalleryItem = { uri: string; style: string; time: number };
+
+function galleryDir() {
+  const dir = new Directory(Paths.document, 'gallery');
+  if (!dir.exists) dir.create();
+  return dir;
+}
+
+export async function addToGallery(uri: string, style: string): Promise<string> {
+  const dest = new File(galleryDir(), `${Date.now()}__${style}.jpg`);
+  new File(uri).copy(dest);
+  return dest.uri;
+}
+
+export async function listGallery(): Promise<GalleryItem[]> {
+  return galleryDir()
+    .list()
+    .filter((x): x is File => x instanceof File && x.name.endsWith('.jpg'))
+    .map((x) => {
+      const [time, style] = x.name.replace('.jpg', '').split('__');
+      return { uri: x.uri, style, time: Number(time) };
+    })
+    .sort((a, b) => b.time - a.time);
+}

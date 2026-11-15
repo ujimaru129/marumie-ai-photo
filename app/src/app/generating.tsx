@@ -4,10 +4,11 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 
-import { Button, shadow } from '@/components/ui';
+import { Ambient } from '@/components/ambient';
+import { Button, Lift } from '@/components/ui';
 import { C, f } from '@/constants/theme';
 import { ApiError, downloadResult, generate } from '@/lib/api';
-import { removeFile, storeResult } from '@/lib/files';
+import { addToGallery, removeFile, storeResult } from '@/lib/files';
 import { t } from '@/lib/i18n';
 import { prepareUpload, toJpeg } from '@/lib/photo';
 import { getState, setState } from '@/lib/store';
@@ -36,7 +37,7 @@ export default function Generating() {
       const images = [];
       for (const im of g.images) {
         const raw = await storeResult(await downloadResult(im.url), `${g.id}_${im.variant}.img`);
-        images.push({ variant: im.variant, uri: await toJpeg(raw, style.mirror) });
+        images.push({ variant: im.variant, uri: await addToGallery(await toJpeg(raw, style.mirror), style.id) });
         await removeFile(raw);
       }
       setState({ balance: { freeLeft: g.freeLeft, credits: g.credits }, result: { id: g.id, style, original: picked.uri, images } });
@@ -53,13 +54,16 @@ export default function Generating() {
   const picked = getState().picked;
   return (
     <View style={s.wrap}>
-      <View style={[s.cheki, shadow]}>
+      <Ambient uri={picked?.uri} veil={0.6} />
+      <Lift radius={4} style={s.cheki}>
+        <View style={{ flex: 1, backgroundColor: '#fff', padding: 12, paddingBottom: 48 }}>
         <View style={s.photo}>
           {picked && <Image source={{ uri: picked.uri }} style={StyleSheet.absoluteFill} contentFit="cover" blurRadius={6} />}
           {/* 白から少しずつ写真が浮かび上がる（チェキの現像） */}
           <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: '#F4F2EE', opacity: veil }]} />
         </View>
-      </View>
+        </View>
+      </Lift>
       {error ? (
         <>
           <Text style={[f(700), s.err]}>{error}</Text>
@@ -80,10 +84,10 @@ export default function Generating() {
 
 const s = StyleSheet.create({
   wrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, backgroundColor: C.bg },
-  cheki: { width: 220, backgroundColor: '#fff', padding: 12, paddingBottom: 48, borderRadius: 3, transform: [{ rotate: '-3deg' }] },
+  cheki: { width: 230, aspectRatio: 230 / (12 + 206 * 4 / 3 + 48), transform: [{ perspective: 800 }, { rotate: '-4deg' }, { rotateX: '6deg' }] },
   photo: { aspectRatio: 3 / 4, backgroundColor: '#E9E6E0', overflow: 'hidden' },
   title: { fontSize: 24, color: C.ink, marginTop: 44, letterSpacing: -0.4 },
-  track: { width: 240, height: 3, borderRadius: 2, backgroundColor: C.fill, marginTop: 18, overflow: 'hidden' },
+  track: { width: 240, height: 3, borderRadius: 2, backgroundColor: 'rgba(0,0,0,0.08)', marginTop: 18, overflow: 'hidden' },
   bar: { width: 120, height: 3, borderRadius: 2, backgroundColor: C.ink },
   sub: { fontSize: 13, color: C.sub, marginTop: 14 },
   err: { fontSize: 15, lineHeight: 23, color: C.ink, marginTop: 40, textAlign: 'center' },

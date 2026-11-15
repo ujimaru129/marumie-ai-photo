@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Ambient } from '@/components/ambient';
+import { Glass } from '@/components/glass';
 import { Button, Caption, Title, Wordmark } from '@/components/ui';
 import { C, f, fl } from '@/constants/theme';
 import { t } from '@/lib/i18n';
@@ -48,11 +50,13 @@ export default function Age() {
   }
 
   return (
+    <View style={{ flex: 1 }}>
+    <Ambient />
     <SafeAreaView style={s.wrap}>
       <Wordmark />
       <Title title={t.ageTitle} sub={t.ageSub} style={{ marginTop: 28 }} />
       <Text style={[f(500), s.body]}>{t.ageBody}</Text>
-      <View style={s.wheel}>
+      <Glass radius={24} style={s.wheel}>
         <FlatList
           data={years}
           keyExtractor={(y) => String(y)}
@@ -68,7 +72,7 @@ export default function Age() {
             );
           }}
         />
-      </View>
+      </Glass>
       {needMonth && (
         <View style={{ marginTop: 12 }}>
           <Caption>{t.ageYear}</Caption>
@@ -83,16 +87,17 @@ export default function Age() {
       )}
       <Button title={t.next} onPress={next} disabled={!ready} style={{ marginTop: 16 }} />
     </SafeAreaView>
+    </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { flex: 1, paddingHorizontal: 24, paddingTop: 12, paddingBottom: 16, backgroundColor: C.bg },
+  wrap: { flex: 1, paddingHorizontal: 24, paddingTop: 12, paddingBottom: 16 },
   body: { fontSize: 14, lineHeight: 21, color: C.sub, marginTop: 12 },
-  wheel: { flex: 1, marginTop: 20, borderRadius: 22, backgroundColor: C.fill, overflow: 'hidden', paddingHorizontal: 8 },
+  wheel: { flex: 1, marginTop: 20, paddingHorizontal: 8 },
   row: { height: ROW, alignItems: 'center', justifyContent: 'center', borderRadius: 14 },
-  rowOn: { backgroundColor: '#fff' },
+  rowOn: { backgroundColor: '#fff', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
   months: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
-  month: { width: 44, height: 40, borderRadius: 12, backgroundColor: C.fill, alignItems: 'center', justifyContent: 'center' },
+  month: { width: 44, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.8)', alignItems: 'center', justifyContent: 'center' },
   blocked: { fontSize: 18, lineHeight: 28, color: C.ink, marginTop: 40 },
 });
