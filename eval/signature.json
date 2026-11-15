@@ -28,8 +28,8 @@
       "strength": 0.8
     },
     "sakura": "day",
-    "y2k_bedroom": "day",
-    "purikura": null,
-    "vending_night": "night"
+    "vending_night": "night",
+    "korean_booth": null,
+    "korean_booth_black": null
   }
 }
