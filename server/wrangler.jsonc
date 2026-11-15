@@ -1,0 +1,27 @@
+// MARUMIE AI PHOTO の中継サーバー（Cloudflare Workers）
+// 公開前に: database_id を `wrangler d1 create marumie-ai-photo` の結果に置き換え、
+// R2 に 1日で消えるルールを付ける（README 参照）。APIキーは `wrangler secret put` で入れる（このファイルには書かない）
+{
+  "name": "marumie-ai-photo",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "observability": { "enabled": true },
+  "vars": {
+    // 1回の生成で作る枚数（結果画面で選ぶ）と、1回で使うクレジット
+    "VARIANTS": "2",
+    "CREDITS_PER_GENERATION": "1",
+    // 初回の無料生成の回数
+    "FREE_GENERATIONS": "1",
+    // Muse Image の reasoning_strength（high / low）。失敗したら low でやり直し、それでもだめなら Gemini
+    "META_REASONING": "high",
+    // テストで差し替えるため（本番はこのまま）
+    "META_BASE_URL": "https://api.meta.ai",
+    "GEMINI_BASE_URL": "https://generativelanguage.googleapis.com"
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "marumie-ai-photo", "database_id": "00000000-0000-0000-0000-000000000000" }
+  ],
+  "r2_buckets": [
+    { "binding": "RESULTS", "bucket_name": "marumie-ai-photo-results" }
+  ]
+}
