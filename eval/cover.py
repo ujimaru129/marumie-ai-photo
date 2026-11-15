@@ -40,23 +40,26 @@ def frame(img, cat, out_size=(1344, 1792), face_ratio=0.22, head_top=0.08, max_z
     """人物の大きさと位置をそろえて、表紙の大きさ（3:4）に切り出す。
     - 顔の高さが画面の face_ratio になるように拡大する（劣化を抑えるため max_zoom 倍まで。大きすぎる人物は縮小しない）
     - 頭のてっぺん（髪の上端）を上から head_top の位置にそろえ、顔を左右の中央に置く
-    戻り値: (切り出した画像, 実際の拡大率)"""
+    戻り値: (切り出した画像, 実際の拡大率, 大きすぎるか)
+    大きすぎる（顔が目安の1.2倍を超える）人物は縮小できない（背景を描き足す必要がある）ので、アプリでは作り直す。"""
     W, H = img.size
     ow, oh = out_size
     base = min(W / ow, H / oh)  # 拡大なしで 3:4 を切り出すときの倍率
     fy, fx = np.where(cat == 3)
     hy, _ = np.where((cat == 1) | (cat == 3))
+    too_big = False
     if len(fy) == 0:
         zoom, top, cx = 1.0, None, W / 2
     else:
         face_h = (fy.max() - fy.min()) / (oh * base)  # 拡大なしの切り出しに対する顔の高さの割合
         zoom = min(max(face_ratio / face_h, 1.0), max_zoom)
+        too_big = face_h > face_ratio * 1.2
         top, cx = hy.min(), fx.mean()
     cw, ch = ow * base / zoom, oh * base / zoom  # 元の画像の上で切り出す範囲
     x0 = min(max(cx - cw / 2, 0), W - cw)
     y0 = 0 if top is None else min(max(top - head_top * ch, 0), H - ch)
     crop = img.crop((int(x0), int(y0), int(x0 + cw), int(y0 + ch))).resize(out_size, Image.LANCZOS)
-    return crop, zoom
+    return crop, zoom, too_big
 
 
 def pick_color(img):
@@ -76,7 +79,9 @@ def main():
     a = ap.parse_args()
 
     img = Image.open(a.src).convert("RGB")
-    img, zoom = frame(img, categories(img, a.model))
+    img, zoom, too_big = frame(img, categories(img, a.model))
+    if too_big:
+        print("注意: 人物が大きすぎる（作り直しを勧める）:", a.src)
     W, H = img.size
     mask = person_mask(categories(img, a.model))
     color = pick_color(img)
