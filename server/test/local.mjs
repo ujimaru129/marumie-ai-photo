@@ -93,7 +93,7 @@ try {
   check("スタイル一覧は14種", st.data.styles.length === 14);
   check("スタイル一覧に指示文が入っていない", !text.includes("Using this photo") && !text.includes('"prompt"'));
   const booth = st.data.styles.find((s) => s.id === "korean_booth");
-  check("セルフ写真館は mirror と枠の色の選択肢を返す", booth.mirror === true && Object.keys(booth.options.frame.choices).join() === "red,black");
+  check("セルフ写真館は枠の色の選択肢を返す（左右反転はしない）", booth.mirror === false && Object.keys(booth.options.frame.choices).join() === "red,black");
 
   // 生成（初回無料）
   calls.length = 0;
