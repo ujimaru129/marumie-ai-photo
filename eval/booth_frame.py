@@ -2,7 +2,7 @@
 
 AI には文字を描かせない（崩れやすいため）。端末内でロゴを重ねる想定で、ここでは見え方の確認用に合成する。
 - 枠の色を画像の四隅から読み取り、下から見て「枠の色だけの行」が続く範囲を下の余白とみなす
-- 余白の中央に、MARUMIE のワードマーク（Paper 版）と「PHOTO」を置く
+- 下の余白を枠の色で塗りつぶし（AI が描いた四角などを消す）、中央に MARUMIE のワードマーク（Paper 版）と「PHOTO」を置く
 
 使い方: python3 booth_frame.py <生成した写真> <出力>
 """
@@ -58,6 +58,8 @@ def main():
     x = (W - total) / 2
     y = top + (margin - wm.height) / 2
     out = img.convert("RGBA")
+    # AI が余白に四角や模様を描くことがあるので、ロゴを置く前に下の余白全体を枠の色で塗りつぶす
+    ImageDraw.Draw(out).rectangle((0, top, W, H), fill=tuple(int(c) for c in frame) + (255,))
     out.alpha_composite(wm, (int(x), int(y)))
     d = ImageDraw.Draw(out)
     bb = d.textbbox((0, 0), label, font=f)
