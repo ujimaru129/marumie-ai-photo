@@ -22,12 +22,18 @@
       "lut": null,
       "grain": 0.25
     },
-    "beach_day": "day",
+    "beach_day": {
+      "lut": "day",
+      "grain": 0.2
+    },
     "rooftop_night": {
       "lut": "night",
       "strength": 0.8
     },
-    "sakura": "day",
+    "sakura": {
+      "lut": "day",
+      "grain": 0.2
+    },
     "vending_night": "night",
     "korean_booth": null,
     "korean_booth_black": null
