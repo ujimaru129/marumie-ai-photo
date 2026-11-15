@@ -4,3 +4,4 @@ eval/inputs/
 eval/out/
 __pycache__/
 .DS_Store
+eval/models/
