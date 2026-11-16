@@ -79,7 +79,7 @@ export default function Age() {
           <View style={s.months}>
             {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
               <Pressable key={m} onPress={() => setMonth(m)} style={[s.month, m === month && { backgroundColor: C.ink }]}>
-                <Text style={[fl(700), { fontSize: 15, color: m === month ? '#fff' : C.ink }]}>{m}</Text>
+                <Text style={[fl(700), { fontSize: 15, color: m === month ? C.dark : C.ink }]}>{m}</Text>
               </Pressable>
             ))}
           </View>
@@ -96,8 +96,8 @@ const s = StyleSheet.create({
   body: { fontSize: 14, lineHeight: 21, color: C.sub, marginTop: 12 },
   wheel: { flex: 1, marginTop: 20, paddingHorizontal: 8 },
   row: { height: ROW, alignItems: 'center', justifyContent: 'center', borderRadius: 14 },
-  rowOn: { backgroundColor: '#fff', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
+  rowOn: { backgroundColor: 'rgba(255,255,255,0.14)', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
   months: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
-  month: { width: 44, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.8)', alignItems: 'center', justifyContent: 'center' },
+  month: { width: 44, height: 40, borderRadius: 12, backgroundColor: C.fill, alignItems: 'center', justifyContent: 'center' },
   blocked: { fontSize: 18, lineHeight: 28, color: C.ink, marginTop: 40 },
 });

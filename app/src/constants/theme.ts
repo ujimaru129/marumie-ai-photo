@@ -1,14 +1,16 @@
 // 画面の色と文字（参考: Must の、白地に太い見出し・写真が主役・薄いグレーのボタン）
 import { lang } from '@/lib/i18n';
 
+// 暗いグレーの地に白い文字（写真の色をにじませた背景でも文字が読めるように）
 export const C = {
-  bg: '#FFFFFF',
-  ink: '#0F0F10',
-  sub: '#8E8E93',
-  faint: '#C7C7CC',
-  fill: '#F2F2F4',
-  line: '#E6E6EA',
-  red: '#D74343', // MARUMIE の赤い丸
+  bg: '#1B1B1E',
+  ink: '#FFFFFF', // 文字
+  sub: 'rgba(255,255,255,0.62)',
+  faint: 'rgba(255,255,255,0.5)',
+  fill: 'rgba(255,255,255,0.09)',
+  line: 'rgba(255,255,255,0.14)',
+  dark: '#111113', // 明るいガラスの上の文字
+  red: '#E05252', // MARUMIE の赤い丸
 } as const;
 
 type W = 500 | 600 | 700 | 800;

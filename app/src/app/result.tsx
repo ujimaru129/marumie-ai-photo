@@ -53,7 +53,7 @@ export default function Result() {
   return (
     <View style={{ flex: 1 }}>
     <StatusBar style="light" />
-    <Ambient uri={current.uri} dark veil={0.45} />
+    <Ambient uri={current.uri} veil={0.55} />
     <SafeAreaView style={s.wrap}>
       <View style={s.bar}>
         <RoundAction icon="close" onPress={() => router.dismissTo('/')} size={40} />

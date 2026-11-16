@@ -30,7 +30,7 @@ export function Press({ children, onPress, onPressIn, onPressOut, disabled, styl
 }
 
 /** MARUMIE の正式なワードマーク（assets/brand の SVG から書き出した画像） */
-export function Wordmark({ height = 19, paper }: { height?: number; paper?: boolean }) {
+export function Wordmark({ height = 19, paper = true }: { height?: number; paper?: boolean }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8 }}>
       <Image
@@ -38,7 +38,7 @@ export function Wordmark({ height = 19, paper }: { height?: number; paper?: bool
         style={{ height, width: height * (900 / 157) }}
         contentFit="contain"
       />
-      <Text style={[f(800), { fontFamily: 'Inter-800', fontSize: height * 0.52, letterSpacing: 1.4, color: paper ? '#fff' : C.sub, marginBottom: 1 }]}>AI PHOTO</Text>
+      <Text style={[f(800), { fontFamily: 'Inter-800', fontSize: height * 0.52, letterSpacing: 1.4, color: C.sub, marginBottom: 1 }]}>AI PHOTO</Text>
     </View>
   );
 }
@@ -58,7 +58,7 @@ export function Button({ title, sub, onPress, disabled, busy, kind = 'primary', 
   title: string; sub?: string; onPress: () => void; disabled?: boolean; busy?: boolean; kind?: 'primary' | 'soft'; icon?: IconName; style?: ViewStyle;
 }) {
   const dark = kind === 'primary';
-  const color = dark ? '#fff' : C.ink;
+  const color = dark ? C.dark : C.ink;
   return (
     <Press onPress={onPress} disabled={disabled || busy} haptic style={[dark ? depth.button : depth.soft, disabled || busy ? { opacity: 0.35 } : {}, { borderRadius: 20 }, style ?? {}]}>
       <Glass tint={dark ? 'dark' : 'light'} radius={20} style={s.btn}>
@@ -82,7 +82,7 @@ export function Pill({ label, on, onPress }: { label: string; on?: boolean; onPr
   return (
     <Press onPress={onPress} style={on ? depth.soft : {}}>
       <Glass tint={on ? 'dark' : 'light'} radius={18} style={s.pill}>
-        <Text style={[f(700), { fontSize: 14, color: on ? '#fff' : C.ink }]}>{label}</Text>
+        <Text style={[f(700), { fontSize: 14, color: on ? C.dark : C.ink }]}>{label}</Text>
       </Glass>
     </Press>
   );
@@ -92,7 +92,7 @@ export function Check({ checked, label, onToggle, light }: { checked: boolean; l
   return (
     <Pressable accessibilityRole="checkbox" accessibilityState={{ checked }} onPress={onToggle} style={s.check} hitSlop={6}>
       <View style={[s.box, checked && { backgroundColor: C.ink, borderColor: C.ink }]}>
-        {checked && <Icon name="check" size={12} color="#fff" />}
+        {checked && <Icon name="check" size={12} color={C.dark} />}
       </View>
       <Text style={[f(500), { flex: 1, fontSize: 13, color: light ? '#fff' : C.ink }]}>{label}</Text>
     </Pressable>
@@ -109,7 +109,7 @@ export function RoundAction({ icon, label, onPress, dark, busy, size = 58, light
     <View style={{ alignItems: 'center', gap: 7 }}>
       <Press onPress={onPress} disabled={busy} haptic style={[depth.soft, { borderRadius: size / 2 }]}>
         <Glass tint={dark ? 'dark' : 'light'} radius={size / 2} style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-          {busy ? <ActivityIndicator color={dark ? '#fff' : C.ink} /> : <Icon name={icon} size={size * 0.36} color={dark ? '#fff' : C.ink} />}
+          {busy ? <ActivityIndicator color={dark ? C.dark : C.ink} /> : <Icon name={icon} size={size * 0.36} color={dark ? C.dark : C.ink} />}
         </Glass>
       </Press>
       {label ? <Text style={[f(700), { fontSize: 12, color: light ? '#fff' : C.ink }]}>{label}</Text> : null}
@@ -122,7 +122,7 @@ export function Lift({ children, radius, style }: { children: ReactNode; radius:
   return (
     <View style={[depth.far, { borderRadius: radius }, style]}>
       <View style={[depth.near, { borderRadius: radius, flex: 1 }]}>
-        <View style={{ borderRadius: radius, overflow: 'hidden', flex: 1, backgroundColor: C.fill }}>{children}</View>
+        <View style={{ borderRadius: radius, overflow: 'hidden', flex: 1, backgroundColor: '#2A2A2E' }}>{children}</View>
       </View>
     </View>
   );
@@ -130,7 +130,7 @@ export function Lift({ children, radius, style }: { children: ReactNode; radius:
 
 export const depth = StyleSheet.create({
   near: { shadowColor: '#000', shadowOpacity: 0.14, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, elevation: 3 },
-  far: { shadowColor: '#1A1430', shadowOpacity: 0.22, shadowRadius: 28, shadowOffset: { width: 0, height: 18 }, elevation: 12 },
+  far: { shadowColor: '#000', shadowOpacity: 0.45, shadowRadius: 28, shadowOffset: { width: 0, height: 18 }, elevation: 12 },
   button: { shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8 },
   soft: { shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
 });
@@ -140,5 +140,5 @@ const s = StyleSheet.create({
   btn: { minHeight: 58, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 8 },
   pill: { paddingHorizontal: 18, height: 38, alignItems: 'center', justifyContent: 'center' },
   check: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 },
-  box: { width: 22, height: 22, borderRadius: 7, borderWidth: 1.5, borderColor: C.faint, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.7)' },
+  box: { width: 22, height: 22, borderRadius: 7, borderWidth: 1.5, borderColor: C.faint, alignItems: 'center', justifyContent: 'center' },
 });

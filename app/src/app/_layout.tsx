@@ -12,7 +12,7 @@ export default function RootLayout() {
   if (!loaded) return null;
   return (
     <>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.bg } }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="onboarding/age" />

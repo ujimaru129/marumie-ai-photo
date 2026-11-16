@@ -3,15 +3,13 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, View } from 'react-native';
 
-export function Ambient({ uri, veil = 0.55, dark }: { uri?: string | null; veil?: number; dark?: boolean }) {
+// veil: 写真の上にかける暗いグレーの濃さ（0〜1）。白い文字が読める濃さにする
+export function Ambient({ uri, veil = 0.55 }: { uri?: string | null; veil?: number; dark?: boolean }) {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <LinearGradient colors={dark ? ['#17161A', '#0B0B0C'] : ['#FFFFFF', '#F0EFF3']} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={['#2A2A2F', '#141416']} style={StyleSheet.absoluteFill} />
       {uri ? <Image source={{ uri }} style={[StyleSheet.absoluteFill, { transform: [{ scale: 1.3 }] }]} contentFit="cover" blurRadius={60} /> : null}
-      <LinearGradient
-        colors={dark ? [`rgba(10,10,12,${veil - 0.15})`, `rgba(10,10,12,${veil + 0.25})`] : [`rgba(255,255,255,${veil - 0.1})`, `rgba(255,255,255,${veil + 0.3})`]}
-        style={StyleSheet.absoluteFill}
-      />
+      <LinearGradient colors={[`rgba(22,22,25,${Math.min(veil, 0.9)})`, `rgba(14,14,16,${Math.min(veil + 0.25, 0.95)})`]} style={StyleSheet.absoluteFill} />
     </View>
   );
 }

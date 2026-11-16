@@ -14,26 +14,27 @@ export function Glass({ children, tint = 'light', radius = 22, style, strong }: 
     return (
       <GlassView
         glassEffectStyle="regular"
-        tintColor={tint === 'dark' ? 'rgba(15,15,16,0.55)' : undefined}
+        tintColor={tint === 'dark' ? 'rgba(255,255,255,0.85)' : undefined}
         isInteractive
         style={[{ borderRadius: radius, overflow: 'hidden' }, style]}>
         {children}
       </GlassView>
     );
   }
-  const dark = tint === 'dark';
+  // tint 'dark' は「目立たせるガラス」（明るい白いガラス）、'light' は暗い地の上のすりガラス
+  const bright = tint === 'dark';
   return (
     <View style={[{ borderRadius: radius, overflow: 'hidden' }, style]}>
-      <BlurView intensity={strong ? 60 : 40} tint={dark ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
+      <BlurView intensity={strong ? 60 : 40} tint={bright ? 'light' : 'dark'} style={StyleSheet.absoluteFill} />
       {/* ガラスの厚み: 色の薄い膜＋上から下への光 */}
-      <View style={[StyleSheet.absoluteFill, { backgroundColor: dark ? 'rgba(14,14,16,0.84)' : 'rgba(255,255,255,0.55)' }]} />
+      <View style={[StyleSheet.absoluteFill, { backgroundColor: bright ? 'rgba(255,255,255,0.9)' : strong ? 'rgba(30,30,34,0.62)' : 'rgba(40,40,46,0.42)' }]} />
       <LinearGradient
-        colors={dark ? ['rgba(255,255,255,0.18)', 'rgba(255,255,255,0.02)'] : ['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.15)']}
+        colors={bright ? ['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.3)'] : ['rgba(255,255,255,0.16)', 'rgba(255,255,255,0.02)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={[StyleSheet.absoluteFill, { opacity: 0.6 }]}
       />
-      <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: radius, borderWidth: StyleSheet.hairlineWidth * 2, borderColor: dark ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.9)' }]} />
+      <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: radius, borderWidth: StyleSheet.hairlineWidth * 2, borderColor: bright ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.2)' }]} />
       {children}
     </View>
   );

@@ -87,7 +87,7 @@ const s = StyleSheet.create({
   cheki: { width: 230, aspectRatio: 230 / (12 + 206 * 4 / 3 + 48), transform: [{ perspective: 800 }, { rotate: '-4deg' }, { rotateX: '6deg' }] },
   photo: { aspectRatio: 3 / 4, backgroundColor: '#E9E6E0', overflow: 'hidden' },
   title: { fontSize: 24, color: C.ink, marginTop: 44, letterSpacing: -0.4 },
-  track: { width: 240, height: 3, borderRadius: 2, backgroundColor: 'rgba(0,0,0,0.08)', marginTop: 18, overflow: 'hidden' },
+  track: { width: 240, height: 3, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.15)', marginTop: 18, overflow: 'hidden' },
   bar: { width: 120, height: 3, borderRadius: 2, backgroundColor: C.ink },
   sub: { fontSize: 13, color: C.sub, marginTop: 14 },
   err: { fontSize: 15, lineHeight: 23, color: C.ink, marginTop: 40, textAlign: 'center' },

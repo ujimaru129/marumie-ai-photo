@@ -16,7 +16,7 @@ function TabButton({ icon, label, isFocused, ...props }: TabProps) {
   return (
     <Pressable {...props} style={s.tab}>
       <View style={[s.iconWrap, isFocused && s.iconOn]}>
-        <Icon name={icon} size={19} color={isFocused ? '#fff' : C.ink} />
+        <Icon name={icon} size={19} color={isFocused ? C.dark : C.ink} />
       </View>
       <Text style={[f(700), { fontSize: 10, color: isFocused ? C.ink : C.sub }]}>{label}</Text>
     </Pressable>

@@ -129,7 +129,7 @@ function Hero({ style }: { style: Style }) {
       <Lift radius={26} style={{ aspectRatio: 4 / 5 }}>
         <Image source={{ uri: API_URL + style.sample }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
         {/* 下にガラスの帯で名前をのせる */}
-        <Glass tint="dark" radius={18} style={s.heroLabel}>
+        <Glass radius={18} strong style={s.heroLabel}>
           <Text style={[fl(800), { fontSize: 18, color: '#fff', letterSpacing: -0.3 }]} numberOfLines={1}>{style.name.en}</Text>
           <Text style={[f(500), { fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 1 }]} numberOfLines={1}>{style.desc?.[lang] ?? style.name[lang]}</Text>
         </Glass>
