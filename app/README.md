@@ -26,6 +26,20 @@ EXPO_PUBLIC_API_URL=http://<中継サーバー> npx expo start
 
 ネイティブの部品（画像の選択・保存など）を使うので、実機では開発用ビルド（`npx expo run:android` / `eas build --profile development`）で動かす。
 
+## 仕上げ（src/finish）
+
+生成した写真に、端末内で MARUMIE の仕上げをかけてから表示・保存する。
+
+| 処理 | 内容 |
+|---|---|
+| LUT＋グレイン | MARUMIE Day / Night（`assets/luts`、33³ の帯テクスチャ。MARUMIE CAMERA と同じ形式）を、スタイルごとの強さでかける。グレインは暗い所ほど強く |
+| セルフ写真館 | 枠の色と下の余白を見つけ、余白を枠の色で塗って「MARUMIE PHOTO」（`assets/brand/booth-lockup-*.png`）を置く |
+| 雑誌の表紙 | 人物の切り抜き（MediaPipe selfie_multiclass、`assets/models`、Apache 2.0）で人物の大きさをそろえて切り出し、題字を人物の後ろに置く |
+
+- 中身（`core.ts`）は Skia を引数で受け取るので、Node でも動かせる。`npx tsx scripts/check-finish.ts` / `scripts/check-cover.ts` で検証の Python と見比べた（LUT の差は平均 1/255 程度）
+- Web 版では人物の切り抜きはしない（題字は人物の上にのる）。切り抜きは実機でだけ動く（未確認）
+- 人物の切り抜きのモデルは 16MB あり、アプリが重くなる。雑誌の表紙のためだけなので、後でサーバー側やもっと小さいモデルも検討する
+
 ## 確認済み
 
 - 型チェック（`npx tsc --noEmit`）・lint（`npx expo lint`）・Android の JS バンドルの書き出し（`npx expo export --platform android`）
@@ -34,6 +48,5 @@ EXPO_PUBLIC_API_URL=http://<中継サーバー> npx expo start
 
 ## まだ入れていないもの
 
-- 仕上げ（MARUMIE の LUT・グレイン・雑誌の題字・セルフ写真館のロゴ）… 3. の段階（MARUMIE CAMERA の Skia シェーダーを使う）
 - 課金画面・クレジットの購入 … 4. の段階
 - 公開用のスタイルの見本画像（今は検証の写真を試作でだけ使用。リポジトリには入れず、サーバーの R2 `samples/` から配る）

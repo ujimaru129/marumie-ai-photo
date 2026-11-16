@@ -8,9 +8,10 @@ import { Ambient } from '@/components/ambient';
 import { Button, Lift } from '@/components/ui';
 import { C, f } from '@/constants/theme';
 import { ApiError, downloadResult, generate } from '@/lib/api';
+import { finishPhoto } from '@/finish';
 import { addToGallery, removeFile, storeResult } from '@/lib/files';
 import { t } from '@/lib/i18n';
-import { prepareUpload, toJpeg } from '@/lib/photo';
+import { prepareUpload } from '@/lib/photo';
 import { getState, setState } from '@/lib/store';
 
 export default function Generating() {
@@ -33,16 +34,20 @@ export default function Generating() {
     }
     (async () => {
       const jpeg = await prepareUpload(picked.uri, picked.width, picked.height, style.mirror);
-      const g = await generate(jpeg, style.id, JSON.parse(params.options ?? '{}'));
+      const options = JSON.parse(params.options ?? '{}') as Record<string, string>;
+      const g = await generate(jpeg, style.id, options);
       const images = [];
       for (const im of g.images) {
         const raw = await storeResult(await downloadResult(im.url), `${g.id}_${im.variant}.img`);
-        images.push({ variant: im.variant, uri: await addToGallery(await toJpeg(raw, style.mirror), style.id) });
+        // MARUMIE の仕上げ（LUT・グレイン・ロゴ）を端末内でかける
+        const finished = await finishPhoto(raw, style, options, `${g.id}_${im.variant}`);
+        images.push({ variant: im.variant, uri: await addToGallery(finished, style.id) });
         await removeFile(raw);
       }
       setState({ balance: { freeLeft: g.freeLeft, credits: g.credits }, result: { id: g.id, style, original: picked.uri, images } });
       if (alive) router.replace('/result');
     })().catch((e) => {
+      if (__DEV__) console.warn('generate failed', e);
       const code = e instanceof ApiError ? e.code : 'failed';
       if (alive) setError(code === 'no_credits' ? t.errNoCredits : code === 'blocked' ? t.errBlocked : code === 'network' ? t.errNetwork : t.errFailed);
     });

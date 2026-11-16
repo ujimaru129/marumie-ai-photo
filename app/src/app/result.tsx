@@ -130,7 +130,7 @@ const s = StyleSheet.create({
   stage: { flex: 1, marginTop: 6, alignItems: 'center', justifyContent: 'center' },
   main: { flex: 1, borderRadius: 22, overflow: 'hidden', backgroundColor: C.fill },
   holdTag: { position: 'absolute', top: 12, right: 12, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, height: 28 },
-  ai: { position: 'absolute', right: 14, bottom: 12, fontSize: 10, letterSpacing: 1.2, color: '#fff', opacity: 0.85 },
+  ai: { position: 'absolute', left: 14, top: 18, fontSize: 10, letterSpacing: 1.2, color: '#fff', opacity: 0.85 },
   thumbs: { flexDirection: 'row', justifyContent: 'center', gap: 10, marginTop: 16 },
   thumb: { width: 54, height: 72, borderRadius: 12, overflow: 'hidden', opacity: 0.45 },
   thumbOn: { opacity: 1, borderWidth: 2, borderColor: '#fff' },

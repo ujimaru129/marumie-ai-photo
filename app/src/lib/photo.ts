@@ -11,12 +11,3 @@ export async function prepareUpload(uri: string, width: number, height: number, 
   const out = await img.saveAsync({ format: SaveFormat.JPEG, compress: 0.9 });
   return out.uri;
 }
-
-/** 結果の画像（webp など）を、保存・共有しやすい JPEG にする。mirror のスタイルはここで反転を戻す */
-export async function toJpeg(uri: string, mirror: boolean): Promise<string> {
-  const ctx = ImageManipulator.manipulate(uri);
-  if (mirror) ctx.flip(FlipType.Horizontal);
-  const img = await ctx.renderAsync();
-  const out = await img.saveAsync({ format: SaveFormat.JPEG, compress: 0.95 });
-  return out.uri;
-}

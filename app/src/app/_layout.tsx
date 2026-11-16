@@ -2,14 +2,20 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
 
 import { C, FONTS } from '@/constants/theme';
+import { loadSkia } from '@/lib/skiaReady';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded] = useFonts(FONTS);
-  if (!loaded) return null;
+  const [skia, setSkia] = useState(false);
+  useEffect(() => {
+    loadSkia().then(() => setSkia(true));
+  }, []);
+  if (!loaded || !skia) return null;
   return (
     <>
       <StatusBar style="light" />
