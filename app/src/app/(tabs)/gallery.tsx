@@ -15,6 +15,8 @@ import { t } from '@/lib/i18n';
 
 export default function Gallery() {
   const [items, setItems] = useState<GalleryItem[]>([]);
+  // 写真ごとの縦横比（読み込んだときに分かる）。切り取らずにそのままの形で並べる
+  const [ratios, setRatios] = useState<Record<string, number>>({});
   const { width } = useWindowDimensions();
   const w = (width - 24 * 2 - 12) / 2;
 
@@ -38,12 +40,24 @@ export default function Gallery() {
           ) : (
             <>
               <View style={s.grid}>
-                {items.map((it) => (
-                  <Press key={it.uri} onPress={() => Sharing.shareAsync(it.uri, { mimeType: 'image/jpeg', UTI: 'public.jpeg' })} style={{ width: w, marginBottom: 12 }}>
-                    <Lift radius={16} style={{ aspectRatio: 3 / 4 }}>
-                      <Image source={{ uri: it.uri }} style={StyleSheet.absoluteFill} contentFit="cover" />
-                    </Lift>
-                  </Press>
+                {masonry(items, ratios, w).map((col, ci) => (
+                  <View key={ci} style={{ width: w, gap: 12 }}>
+                    {col.map((it) => (
+                      <Press key={it.uri} onPress={() => Sharing.shareAsync(it.uri, { mimeType: 'image/jpeg', UTI: 'public.jpeg' })}>
+                        <Lift radius={14} style={{ width: w, height: w / (ratios[it.uri] ?? 3 / 4) }}>
+                          <Image
+                            source={{ uri: it.uri }}
+                            style={StyleSheet.absoluteFill}
+                            contentFit="contain"
+                            onLoad={(e) => {
+                              const r = e.source.width / e.source.height;
+                              if (r && ratios[it.uri] !== r) setRatios((prev) => ({ ...prev, [it.uri]: r }));
+                            }}
+                          />
+                        </Lift>
+                      </Press>
+                    ))}
+                  </View>
                 ))}
               </View>
               <Text style={[f(500), { fontSize: 11, color: C.sub, textAlign: 'center', marginTop: 8 }]}>{t.galleryNote}</Text>
@@ -55,7 +69,19 @@ export default function Gallery() {
   );
 }
 
+/** 2列に、低い方の列へ順に積む（写真の形がばらばらでも隙間が少ない） */
+function masonry(items: GalleryItem[], ratios: Record<string, number>, w: number): GalleryItem[][] {
+  const cols: GalleryItem[][] = [[], []];
+  const hs = [0, 0];
+  for (const it of items) {
+    const i = hs[0] <= hs[1] ? 0 : 1;
+    cols[i].push(it);
+    hs[i] += w / (ratios[it.uri] ?? 3 / 4) + 12;
+  }
+  return cols;
+}
+
 const s = StyleSheet.create({
   bar: { height: 48, paddingHorizontal: 24, justifyContent: 'center' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  grid: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 },
 });
