@@ -58,19 +58,19 @@ export function Button({ title, sub, onPress, disabled, busy, kind = 'primary', 
   title: string; sub?: string; onPress: () => void; disabled?: boolean; busy?: boolean; kind?: 'primary' | 'soft'; icon?: IconName; style?: ViewStyle;
 }) {
   const dark = kind === 'primary';
-  const color = dark ? C.dark : C.ink;
+  const color = C.ink;
   return (
     <Press onPress={onPress} disabled={disabled || busy} haptic style={[dark ? depth.button : depth.soft, disabled || busy ? { opacity: 0.35 } : {}, { borderRadius: 20 }, style ?? {}]}>
-      <Glass tint={dark ? 'dark' : 'light'} radius={20} style={s.btn}>
+      <Glass tint={dark ? 'clear' : 'light'} radius={20} strong={dark} style={s.btn}>
         {busy ? (
           <ActivityIndicator color={color} />
         ) : (
           <View style={{ alignItems: 'center' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               {icon && <Icon name={icon} size={17} color={color} />}
-              <Text style={[f(700), { fontSize: 16, color }]}>{title}</Text>
+              <Text style={[f(700), { fontSize: 15, letterSpacing: 1.2, color }]}>{title}</Text>
             </View>
-            {sub ? <Text style={[f(500), { fontSize: 11, color, opacity: 0.6, marginTop: 1 }]}>{sub}</Text> : null}
+            {sub ? <Text style={[f(500), { fontSize: 10, letterSpacing: 0.8, color, opacity: 0.65, marginTop: 2 }]}>{sub}</Text> : null}
           </View>
         )}
       </Glass>
@@ -108,8 +108,8 @@ export function RoundAction({ icon, label, onPress, dark, busy, size = 58, light
   return (
     <View style={{ alignItems: 'center', gap: 7 }}>
       <Press onPress={onPress} disabled={busy} haptic style={[depth.soft, { borderRadius: size / 2 }]}>
-        <Glass tint={dark ? 'dark' : 'light'} radius={size / 2} style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-          {busy ? <ActivityIndicator color={dark ? C.dark : C.ink} /> : <Icon name={icon} size={size * 0.36} color={dark ? C.dark : C.ink} />}
+        <Glass tint={dark ? 'clear' : 'light'} radius={size / 2} style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+          {busy ? <ActivityIndicator color={C.ink} /> : <Icon name={icon} size={size * 0.36} color={C.ink} />}
         </Glass>
       </Press>
       {label ? <Text style={[f(700), { fontSize: 12, color: light ? '#fff' : C.ink }]}>{label}</Text> : null}
@@ -131,12 +131,12 @@ export function Lift({ children, radius, style }: { children: ReactNode; radius:
 export const depth = StyleSheet.create({
   near: { shadowColor: '#000', shadowOpacity: 0.14, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, elevation: 3 },
   far: { shadowColor: '#000', shadowOpacity: 0.45, shadowRadius: 28, shadowOffset: { width: 0, height: 18 }, elevation: 12 },
-  button: { shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8 },
+  button: { shadowColor: '#000', shadowOpacity: 0.35, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8 },
   soft: { shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 4 },
 });
 
 const s = StyleSheet.create({
-  title: { fontSize: 32, lineHeight: 46, letterSpacing: -0.6, color: C.ink },
+  title: { fontSize: 25, lineHeight: 38, letterSpacing: 2, color: C.ink },
   btn: { minHeight: 58, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, paddingVertical: 8 },
   pill: { paddingHorizontal: 18, height: 38, alignItems: 'center', justifyContent: 'center' },
   check: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 },

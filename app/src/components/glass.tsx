@@ -7,14 +7,15 @@ import { StyleSheet, View, type ViewStyle } from 'react-native';
 
 const LIQUID = isLiquidGlassAvailable();
 
+// tint: 'light' = 暗い地のすりガラス / 'clear' = 透ける白いガラス（大きなボタン） / 'dark' = ほぼ白（選択中の小さな印）
 export function Glass({ children, tint = 'light', radius = 22, style, strong }: {
-  children?: ReactNode; tint?: 'light' | 'dark'; radius?: number; style?: ViewStyle | ViewStyle[]; strong?: boolean;
+  children?: ReactNode; tint?: 'light' | 'dark' | 'clear'; radius?: number; style?: ViewStyle | ViewStyle[]; strong?: boolean;
 }) {
   if (LIQUID) {
     return (
       <GlassView
         glassEffectStyle="regular"
-        tintColor={tint === 'dark' ? 'rgba(255,255,255,0.85)' : undefined}
+        tintColor={tint === 'dark' ? 'rgba(255,255,255,0.85)' : tint === 'clear' ? 'rgba(255,255,255,0.18)' : undefined}
         isInteractive
         style={[{ borderRadius: radius, overflow: 'hidden' }, style]}>
         {children}
@@ -23,18 +24,19 @@ export function Glass({ children, tint = 'light', radius = 22, style, strong }: 
   }
   // tint 'dark' は「目立たせるガラス」（明るい白いガラス）、'light' は暗い地の上のすりガラス
   const bright = tint === 'dark';
+  const clear = tint === 'clear';
   return (
     <View style={[{ borderRadius: radius, overflow: 'hidden' }, style]}>
       <BlurView intensity={strong ? 60 : 40} tint={bright ? 'light' : 'dark'} style={StyleSheet.absoluteFill} />
       {/* ガラスの厚み: 色の薄い膜＋上から下への光 */}
-      <View style={[StyleSheet.absoluteFill, { backgroundColor: bright ? 'rgba(255,255,255,0.9)' : strong ? 'rgba(30,30,34,0.62)' : 'rgba(40,40,46,0.42)' }]} />
+      <View style={[StyleSheet.absoluteFill, { backgroundColor: bright ? 'rgba(255,255,255,0.9)' : clear ? 'rgba(255,255,255,0.2)' : strong ? 'rgba(30,30,34,0.62)' : 'rgba(40,40,46,0.42)' }]} />
       <LinearGradient
-        colors={bright ? ['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.3)'] : ['rgba(255,255,255,0.16)', 'rgba(255,255,255,0.02)']}
+        colors={bright ? ['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.3)'] : clear ? ['rgba(255,255,255,0.45)', 'rgba(255,255,255,0)'] : ['rgba(255,255,255,0.16)', 'rgba(255,255,255,0.02)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={[StyleSheet.absoluteFill, { opacity: 0.6 }]}
       />
-      <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: radius, borderWidth: StyleSheet.hairlineWidth * 2, borderColor: bright ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.2)' }]} />
+      <View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: radius, borderWidth: StyleSheet.hairlineWidth * 2, borderColor: bright ? 'rgba(255,255,255,0.95)' : clear ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.2)' }]} />
       {children}
     </View>
   );
