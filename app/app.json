@@ -64,7 +64,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "apiUrl": "http://localhost:8787"
+      "apiUrl": "https://marumie-ai-photo.332-records.workers.dev"
     }
   }
 }

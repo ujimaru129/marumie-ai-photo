@@ -1,6 +1,6 @@
 // MARUMIE AI PHOTO の中継サーバー（Cloudflare Workers）
-// 公開前に: database_id を `wrangler d1 create marumie-ai-photo` の結果に置き換え、
-// R2 に 1日で消えるルールを付ける（README 参照）。APIキーは `wrangler secret put` で入れる（このファイルには書かない）
+// 2026-11-17 公開済み（https://marumie-ai-photo.332-records.workers.dev）。D1 と R2 は作成済み、R2 の results/ は1日で消えるルールつき。
+// APIキー（META_API_KEY・GEMINI_API_KEY）は Cloudflare の画面の「変数とシークレット」で入れる（このファイルには書かない）
 {
   "name": "marumie-ai-photo",
   "main": "src/index.ts",
@@ -19,7 +19,7 @@
     "GEMINI_BASE_URL": "https://generativelanguage.googleapis.com"
   },
   "d1_databases": [
-    { "binding": "DB", "database_name": "marumie-ai-photo", "database_id": "00000000-0000-0000-0000-000000000000" }
+    { "binding": "DB", "database_name": "marumie-ai-photo", "database_id": "353d8481-a765-424e-87d1-1c9b162f5666" }
   ],
   "r2_buckets": [
     { "binding": "RESULTS", "bucket_name": "marumie-ai-photo-results" }
