@@ -42,6 +42,12 @@ npx wrangler secret put GEMINI_API_KEY
 npm run deploy
 ```
 
+## スタイルの見本画像
+
+R2 の `samples/<スタイルID>.jpg`（編集タブの見本は `samples/edit_before.jpg`・`edit_after.jpg`・`filter_0〜9.jpg`）。`GET /v1/samples/<名前>` で誰でも見られる。
+2026-11-17 時点では、検証で作った写真（協力者の方の写真、了解済み）を仮に入れてある。**公開前に公開用の見本に差し替える**。
+入れ方: `npx wrangler r2 object put marumie-ai-photo-results/samples/<名前>.jpg --file <画像> --content-type image/jpeg --remote`
+
 ## まだ入れていないもの（次の段階）
 
 - 端末の証明（App Attest / Play Integrity）と、同じ端末での登録のし直し対策（4. 課金の段階）
