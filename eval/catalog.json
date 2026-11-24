@@ -1,7 +1,11 @@
 {
   "_説明": "アプリに並べるスタイルの一覧（2026-11-17 時点の案）。prompt は styles/<名前>.txt、仕上げは signature.json。options があるスタイルは、利用者が選べる（選んだ値で使う指示文が変わる）。post は端末で後から重ねる処理（cover = 雑誌の題字、booth = MARUMIE PHOTO のロゴ）",
   "styles": [
-    {"id": "pro_camera", "desc": {"ja": "うまく撮れなかった写真を、プロが一眼で撮ったように", "en": "Turn a so-so shot into a pro mirrorless photo"}, "kind": "effect", "name": {"ja": "プロカメラ", "en": "Pro Camera"}, "prompt": "pro_camera"},
+    {"id": "pro_camera", "desc": {"ja": "うまく撮れなかった写真を、プロが一眼で撮ったように", "en": "Turn a so-so shot into a pro camera photo"}, "kind": "effect", "name": {"ja": "プロカメラ", "en": "Pro Cam"},
+     "options": {"set": {"label": {"ja": "セット", "en": "Set"}, "default": "c",
+       "choices": {"c": {"label": {"ja": "C Set", "en": "C Set"}, "prompt": "pro_camera_c"},
+                   "s": {"label": {"ja": "S Set", "en": "S Set"}, "prompt": "pro_camera_s"},
+                   "f": {"label": {"ja": "F Set", "en": "F Set"}, "prompt": "pro_camera_f"}}}}},
     {"id": "digicam_flash", "desc": {"ja": "2000年代のデジカメで撮ったような、夜の直射フラッシュ", "en": "Night-out direct flash, like a 2000s digicam"}, "kind": "effect", "name": {"ja": "デジカメフラッシュ", "en": "Digicam Flash"}, "prompt": "digicam_flash"},
     {"id": "golden_hour", "desc": {"ja": "夕焼けの逆光で、髪がやわらかく光る", "en": "Warm sunset backlight that makes your hair glow"}, "kind": "effect", "name": {"ja": "夕焼けの逆光", "en": "Golden Hour"}, "prompt": "golden_hour"},
     {"id": "day_flash", "desc": {"ja": "昼の街角で、フラッシュを焚いたスナップ", "en": "Daytime street snap with a pop of flash"}, "kind": "effect", "name": {"ja": "昼のフラッシュ", "en": "Day Flash"}, "prompt": "day_flash"},
