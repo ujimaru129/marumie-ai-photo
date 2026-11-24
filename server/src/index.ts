@@ -143,6 +143,16 @@ async function handle(req: Request, env: Env, ctx: ExecutionContext): Promise<Re
     return json({ deviceId: id, token, freeLeft: free, credits: 0 });
   }
 
+  // テスト版アプリの配布（R2 の dist/<名前>.apk）。名前にランダムな文字列を入れて、知っている人だけが取れるようにする
+  const dist = /^\/dl\/([A-Za-z0-9_-]{16,}\.apk)$/.exec(p);
+  if (req.method === "GET" && dist) {
+    const obj = await env.RESULTS.get(`dist/${dist[1]}`);
+    if (!obj) throw new HttpError(404, "not_found");
+    return new Response(obj.body, {
+      headers: { "Content-Type": "application/vnd.android.package-archive", "Content-Disposition": 'attachment; filename="marumie-ai-photo-test.apk"', "Cache-Control": "no-store" },
+    });
+  }
+
   // スタイルの見本画像（R2 の samples/<id>.jpg。誰でも見られる）
   const sample = /^\/v1\/samples\/([a-z0-9_]+)$/.exec(p);
   if (req.method === "GET" && sample) {
