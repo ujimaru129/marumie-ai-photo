@@ -90,7 +90,7 @@ try {
   // スタイル一覧に指示文が入っていない
   const st = await api("/v1/styles");
   const text = JSON.stringify(st.data);
-  check("スタイル一覧は14種", st.data.styles.length === 14);
+  check("スタイル一覧は15種", st.data.styles.length === 15);
   check("スタイル一覧に指示文が入っていない", !text.includes("Using this photo") && !text.includes('"prompt"'));
   const booth = st.data.styles.find((s) => s.id === "korean_booth");
   check("セルフ写真館は枠の色の選択肢を返す（左右反転はしない）", booth.mirror === false && Object.keys(booth.options.frame.choices).join() === "red,black");
