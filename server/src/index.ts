@@ -199,7 +199,8 @@ async function handle(req: Request, env: Env, ctx: ExecutionContext): Promise<Re
       });
       images.push({ variant: i, url: `/v1/results/${id}/${i}`, model: result.model });
     }
-    const failures = runs.filter((r) => !r.result.ok).map((r) => r.tries.map((t) => (t.ok ? t.model : `${t.model}:${t.kind}`)).join(">"));
+    // 失敗の記録（キーの値は出ない。HTTP の状態と相手のメッセージの先頭だけ）
+    const failures = runs.filter((r) => !r.result.ok).map((r) => r.tries.map((t) => (t.ok ? t.model : `${t.model}:${t.kind}:${t.detail.slice(0, 120)}`)).join(" > "));
     if (failures.length) console.log(JSON.stringify({ generation: id, style: styleId, failures }));
 
     if (images.length === 0) {
