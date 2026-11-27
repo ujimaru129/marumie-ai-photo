@@ -2,6 +2,7 @@
 eval/photos_raw/
 eval/inputs/
 eval/inputs_bad/
+eval/inputs_user/
 eval/out/
 __pycache__/
 .DS_Store
